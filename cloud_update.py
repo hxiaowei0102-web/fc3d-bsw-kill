@@ -204,21 +204,7 @@ def compute_backtest(data):
     last = data[-1]
     next_issue = str(int(last["issue"]) + 1)
 
-    # 下一期预测
-    phk = ptk = pok = None
-    for i in range(1, total):
-        p = data[i-1]; b,s,g = p["b"],p["s"],p["g"]
-        phk = kill_h(b,s,g) if phk is None else apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g)
-        ptk = kill_t(b,s,g) if ptk is None else apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g)
-        pok = kill_o(b,s,g) if pok is None else apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g)
-    lb = data[-1]; b,s,g = lb["b"],lb["s"],lb["g"]
-    next_kill = {
-        "h": apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g),
-        "t": apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g),
-        "o": apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g),
-    }
-
-    # 回测
+    # 统一回测: 从头到尾walk-forward, 同时记录回测和累积最后状态
     phk = ptk = pok = None
     cor = {"h":0,"t":0,"o":0}
     results = []
@@ -227,19 +213,28 @@ def compute_backtest(data):
         phk = kill_h(b,s,g) if phk is None else apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g)
         ptk = kill_t(b,s,g) if ptk is None else apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g)
         pok = kill_o(b,s,g) if pok is None else apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g)
-        if i < start: continue
-        cr = data[i]
-        ho = cr["b"] != phk; to = cr["s"] != ptk; oo = cr["g"] != pok
-        if ho: cor["h"] += 1
-        if to: cor["t"] += 1
-        if oo: cor["o"] += 1
-        results.append({
-            "issue": cr["issue"], "date": cr["date"],
-            "open": f'{cr["b"]}{cr["s"]}{cr["g"]}',
-            "hK": phk, "tK": ptk, "oK": pok,
-            "hOK": ho, "tOK": to, "oOK": oo, "allOK": ho and to and oo
-        })
+        
+        if i >= start:
+            cr = data[i]
+            ho = cr["b"] != phk; to = cr["s"] != ptk; oo = cr["g"] != pok
+            if ho: cor["h"] += 1
+            if to: cor["t"] += 1
+            if oo: cor["o"] += 1
+            results.append({
+                "issue": cr["issue"], "date": cr["date"],
+                "open": f'{cr["b"]}{cr["s"]}{cr["g"]}',
+                "hK": phk, "tK": ptk, "oK": pok,
+                "hOK": ho, "tOK": to, "oOK": oo, "allOK": ho and to and oo
+            })
     results.reverse()
+
+    # 下一期预测: 使用回测累积的fallback状态 (phk/ptk/pok 已走到data[-1])
+    lb = data[-1]; b,s,g = lb["b"],lb["s"],lb["g"]
+    next_kill = {
+        "h": apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g),
+        "t": apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g),
+        "o": apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g),
+    }
 
     n = len(results)
     return {
