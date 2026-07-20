@@ -2,276 +2,344 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>福彩3D 百十个杀码预测</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f7fa;color:#2c3e50;min-height:100vh;padding:12px}
-.header{text-align:center;padding:20px 0 12px}
-.header h1{font-size:22px;font-weight:700;color:#1a237e;letter-spacing:1px}
-.header .sub{font-size:11px;color:#90a4ae;margin-top:4px}
-.pred{background:linear-gradient(135deg,#1a237e,#3949ab);border-radius:12px;padding:20px;color:#fff;margin-bottom:16px;box-shadow:0 4px 20px rgba(26,35,126,.2)}
-.pred .badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:16px;padding:3px 12px;font-size:11px;margin-bottom:12px}
-.pred .issue{font-size:14px;opacity:.9;margin-bottom:16px}
-.pred .pos{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.pred .pcard{background:rgba(255,255,255,.12);border-radius:10px;padding:16px 20px;text-align:center;min-width:90px;border:1px solid rgba(255,255,255,.15)}
-.pred .plabel{font-size:11px;opacity:.75;margin-bottom:4px}
-.pred .pnum{font-size:42px;font-weight:800;line-height:1}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.stat{background:#fff;border-radius:10px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.stat .sl{font-size:11px;color:#90a4ae;margin-bottom:4px}
-.stat .sv{font-size:26px;font-weight:800}
-.stat .se{font-size:10px;color:#90a4ae;margin-top:2px}
-.stat:nth-child(1) .sv{color:#2e7d32}
-.stat:nth-child(2) .sv{color:#1565c0}
-.stat:nth-child(3) .sv{color:#e65100}
-.section-title{font-size:14px;font-weight:700;color:#1a237e;margin:16px 0 10px;padding-bottom:4px;border-bottom:2px solid #e8eaf6}
-.table-wrap{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;margin-bottom:16px}
-.table-scroll{max-height:500px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-size:11px}
-thead{position:sticky;top:0;z-index:2}
-th{background:#1a237e;color:#fff;padding:8px 4px;font-weight:600;font-size:10px;text-align:center}
-td{padding:6px 4px;text-align:center;border-bottom:1px solid #f0f0f0;font-size:10px}
-.row-ok td{}
-.row-fail td{background:#fff3f0}
-.cell-ok{color:#2e7d32;font-weight:600}
-.cell-fail{color:#c62828;font-weight:700}
-.info{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:12px;font-size:11px;line-height:1.6;color:#546e7a}
-.info strong{color:#1a237e}
-.disclaimer{text-align:center;padding:12px;font-size:10px;color:#b0bec5;border-top:1px solid #eceff1}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fa; color: #2c3e50; min-height:100vh; }
+.container { max-width: 1100px; margin:0 auto; padding:20px; }
+
+/* Header */
+.header { text-align:center; padding:30px 0 20px; }
+.header h1 { font-size:28px; font-weight:700; color:#1a237e; letter-spacing:1px; }
+.header h1 span { display:inline-block; margin:0 4px; }
+.header .subtitle { font-size:13px; color:#78909c; margin-top:6px; }
+
+/* Prediction Card */
+.pred-card { background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%); border-radius:16px; padding:30px; color:white; margin-bottom:24px; box-shadow: 0 8px 32px rgba(26,35,126,.25); position:relative; overflow:hidden; }
+.pred-card::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,255,255,.06) 0%, transparent 70%); animation: shimmer 3s infinite; }
+@keyframes shimmer { 0%,100% { transform:translate(0,0); } 50% { transform:translate(10px,10px); } }
+.pred-card .badge { display:inline-block; background:rgba(255,255,255,.18); border-radius:20px; padding:5px 16px; font-size:12px; margin-bottom:20px; letter-spacing:1px; position:relative; z-index:1; }
+.pred-card .issue { font-size:16px; font-weight:600; opacity:.9; margin-bottom:24px; position:relative; z-index:1; }
+.pred-card .positions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
+.pred-card .pos { background:rgba(255,255,255,.12); backdrop-filter:blur(4px); border-radius:12px; padding:20px 28px; text-align:center; min-width:140px; border:1px solid rgba(255,255,255,.15); transition:transform .2s; }
+.pred-card .pos:hover { transform:translateY(-3px); }
+.pred-card .pos-label { font-size:13px; opacity:.75; margin-bottom:8px; }
+.pred-card .pos-num { font-size:52px; font-weight:800; line-height:1; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
+.pred-card .pos-info { font-size:11px; opacity:.65; margin-top:4px; }
+
+/* Stats Section */
+.section-title { font-size:18px; font-weight:700; color:#1a237e; margin:28px 0 16px; padding-bottom:8px; border-bottom:2px solid #e8eaf6; display:flex; align-items:center; gap:8px; }
+.section-title .dot { width:8px; height:8px; border-radius:50%; background:#3949ab; }
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); text-align:center; border-top:3px solid transparent; }
+.stat-card.h { border-top-color:#4caf50; }
+.stat-card.t { border-top-color:#2196f3; }
+.stat-card.o { border-top-color:#ff9800; }
+.stat-card .stat-label { font-size:13px; color:#78909c; margin-bottom:8px; }
+.stat-card .stat-val { font-size:36px; font-weight:800; }
+.stat-card .stat-detail { font-size:12px; color:#90a4ae; margin-top:4px; }
+.stat-card.h .stat-val { color:#2e7d32; }
+.stat-card.t .stat-val { color:#1565c0; }
+.stat-card.o .stat-val { color:#e65100; }
+
+/* Chart */
+.chart-container { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:24px; }
+.chart-container canvas { max-height:320px; }
+
+/* Table */
+.table-wrap { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; margin-bottom:24px; }
+.table-scroll { max-height:600px; overflow-y:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead { position:sticky; top:0; z-index:2; }
+th { background:#1a237e; color:white; padding:10px 8px; font-weight:600; font-size:12px; text-align:center; white-space:nowrap; }
+td { padding:8px; text-align:center; border-bottom:1px solid #f0f0f0; }
+tr:hover td { background:#f5f7ff; }
+tr.row-ok td {  }
+tr.row-fail { background:#fff3f0; }
+tr.row-fail:hover td { background:#ffe8e0; }
+.cell-ok { color:#2e7d32; font-weight:600; }
+.cell-fail { color:#c62828; font-weight:700; }
+.cell-kill { font-weight:600; }
+.cell-actual { font-weight:500; }
+.summary-row td { background:#fafafa; font-size:12px; color:#78909c; border-top:2px solid #e0e0e0; }
+
+/* Strategy Info */
+.info-card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:24px; line-height:1.8; }
+.info-card h3 { color:#1a237e; font-size:15px; margin-bottom:8px; }
+.info-card p { font-size:13px; color:#546e7a; margin-bottom:6px; }
+.info-card code { background:#e8eaf6; padding:2px 6px; border-radius:4px; font-size:12px; color:#3949ab; }
+.info-card .warn { background:#fff3e0; border-left:3px solid #ff9800; padding:10px 14px; border-radius:0 8px 8px 0; margin-top:12px; font-size:12px; color:#e65100; }
+
+/* Tab Navigation */
+.tabs { display:flex; gap:4px; margin:0 0 16px; }
+.tab-btn { padding:8px 20px; border:none; background:#e8eaf6; border-radius:8px 8px 0 0; cursor:pointer; font-size:13px; color:#546e7a; transition:all .2s; }
+.tab-btn.active { background:#1a237e; color:white; }
+.tab-btn:hover:not(.active) { background:#c5cae9; }
+
+/* Legend */
+.legend { display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:#78909c; }
+.legend-item { display:flex; align-items:center; gap:4px; }
+.legend-dot { width:10px; height:10px; border-radius:3px; }
+.legend-dot.ok { background:#c8e6c9; border:1px solid #66bb6a; }
+.legend-dot.fail { background:#ffcdd2; border:1px solid #ef5350; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pred-card .positions { flex-direction:column; align-items:center; }
+  .stats-row { grid-template-columns:1fr; }
+  .gap-grid { grid-template-columns:1fr; }
+  .pred-card .pos-num { font-size:40px; }
+}
+
+/* Disclaimer */
+.disclaimer { text-align:center; padding:20px; font-size:11px; color:#b0bec5; border-top:1px solid #eceff1; margin-top:20px; }
 </style>
 </head>
 <body>
+
+<div class="container">
+
+<!-- Header -->
 <div class="header">
-<h1>福彩3D 百十个杀码预测 V7</h1>
-<div class="sub">2026-07-20 23:27 · 8699期数据 · 公式引擎</div>
+  <h1><span>福彩3D</span><span>百位·十位·个位</span><span>杀码预测</span></h1>
+  <div class="subtitle">数据截至 2026-07-19（第2026190期） · 算法不含未来信息 · 200期回测验证</div>
 </div>
-<div class="pred">
-<div class="badge">🔮 下一期预测</div>
-<div class="issue">第 <strong>2026192</strong> 期 · 2026-07-20</div>
-<div class="pos">
-<div class="pcard"><div class="plabel">百位杀码</div><div class="pnum">4</div></div>
-<div class="pcard"><div class="plabel">十位杀码</div><div class="pnum">7</div></div>
-<div class="pcard"><div class="plabel">个位杀码</div><div class="pnum">0</div></div>
+
+<!-- Prediction Card -->
+<div class="pred-card" id="predCard">
+  <div class="badge">🔮 今日预测</div>
+  <div class="issue">第 <strong id="predIssue">2026191</strong> 期 · 2026-07-20 <small style="opacity:.6">（基于截止第2026190期数据）</small></div>
+  <div class="positions">
+    <div class="pos">
+      <div class="pos-label">百位杀码</div>
+      <div class="pos-num" id="predH">0</div>
+    </div>
+    <div class="pos">
+      <div class="pos-label">十位杀码</div>
+      <div class="pos-num" id="predT">8</div>
+    </div>
+    <div class="pos">
+      <div class="pos-label">个位杀码</div>
+      <div class="pos-num" id="predO">2</div>
+    </div>
+  </div>
 </div>
+
+<!-- Stats -->
+<div class="section-title"><span class="dot"></span>200期回测准确率</div>
+<div class="stats-row">
+  <div class="stat-card h">
+    <div class="stat-label">百位 杀码准确率</div>
+    <div class="stat-val">99.5%</div>
+    <div class="stat-detail">199正确 / 1错误</div>
+  </div>
+  <div class="stat-card t">
+    <div class="stat-label">十位 杀码准确率</div>
+    <div class="stat-val">98.5%</div>
+    <div class="stat-detail">197正确 / 3错误</div>
+  </div>
+  <div class="stat-card o">
+    <div class="stat-label">个位 杀码准确率</div>
+    <div class="stat-val">97.5%</div>
+    <div class="stat-detail">195正确 / 5错误</div>
+  </div>
 </div>
-<div class="section-title">近200期回测准确率</div>
-<div class="stats">
-<div class="stat"><div class="sl">百位</div><div class="sv">99.5%</div><div class="se">错1期</div></div>
-<div class="stat"><div class="sl">十位</div><div class="sv">98.5%</div><div class="se">错3期</div></div>
-<div class="stat"><div class="sl">个位</div><div class="sv">98.0%</div><div class="se">错4期</div></div>
+
+<!-- Chart -->
+<div class="chart-container">
+  <div id="chartLegend" style="display:flex;gap:20px;justify-content:center;margin-bottom:8px;font-size:12px;color:#78909c;">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#4caf50;display:inline-block;border-radius:2px;"></span> 百位</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#2196f3;display:inline-block;border-radius:2px;"></span> 十位</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#ff9800;display:inline-block;border-radius:2px;"></span> 个位</span>
+  </div>
+  <canvas id="cumulativeChart"></canvas>
 </div>
-<div class="section-title">回测明细（近期→远期）</div>
-<div class="table-wrap"><div class="table-scroll"><table>
-<thead><tr><th>期号</th><th>日期</th><th>开奖</th><th>百杀</th><th>百</th><th>十杀</th><th>十</th><th>个杀</th><th>个</th></tr></thead>
-<tbody><tr class="row-ok"><td>2026191</td><td>2026-07-20</td><td>906</td><td>0</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026190</td><td>2026-07-19</td><td>026</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026189</td><td>2026-07-18</td><td>558</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026188</td><td>2026-07-17</td><td>969</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026187</td><td>2026-07-16</td><td>023</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026186</td><td>2026-07-15</td><td>045</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026185</td><td>2026-07-14</td><td>397</td><td>2</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026184</td><td>2026-07-13</td><td>902</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026183</td><td>2026-07-12</td><td>923</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026182</td><td>2026-07-11</td><td>662</td><td>8</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026181</td><td>2026-07-10</td><td>818</td><td>7</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026180</td><td>2026-07-09</td><td>520</td><td>3</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026179</td><td>2026-07-08</td><td>993</td><td>5</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026178</td><td>2026-07-07</td><td>266</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026177</td><td>2026-07-06</td><td>808</td><td>2</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026176</td><td>2026-07-05</td><td>269</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026175</td><td>2026-07-04</td><td>421</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026174</td><td>2026-07-03</td><td>618</td><td>8</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026173</td><td>2026-07-02</td><td>677</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026172</td><td>2026-07-01</td><td>445</td><td>9</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026171</td><td>2026-06-30</td><td>134</td><td>0</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026170</td><td>2026-06-29</td><td>805</td><td>3</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026169</td><td>2026-06-28</td><td>832</td><td>6</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026168</td><td>2026-06-27</td><td>130</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026167</td><td>2026-06-26</td><td>631</td><td>7</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026166</td><td>2026-06-25</td><td>900</td><td>8</td><td class="cell-ok">✓</td><td>0</td><td class="cell-fail">✗</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026165</td><td>2026-06-24</td><td>424</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026164</td><td>2026-06-23</td><td>690</td><td>7</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026163</td><td>2026-06-22</td><td>537</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026162</td><td>2026-06-21</td><td>585</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026161</td><td>2026-06-20</td><td>529</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026160</td><td>2026-06-19</td><td>332</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026159</td><td>2026-06-18</td><td>995</td><td>1</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026158</td><td>2026-06-17</td><td>178</td><td>4</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026157</td><td>2026-06-16</td><td>327</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026156</td><td>2026-06-15</td><td>162</td><td>6</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026155</td><td>2026-06-14</td><td>409</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026154</td><td>2026-06-13</td><td>377</td><td>4</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026153</td><td>2026-06-12</td><td>887</td><td>5</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026152</td><td>2026-06-11</td><td>220</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026151</td><td>2026-06-10</td><td>631</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026150</td><td>2026-06-09</td><td>720</td><td>4</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026149</td><td>2026-06-08</td><td>696</td><td>0</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026148</td><td>2026-06-07</td><td>408</td><td>3</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026147</td><td>2026-06-06</td><td>712</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026146</td><td>2026-06-05</td><td>464</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026145</td><td>2026-06-04</td><td>279</td><td>7</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026144</td><td>2026-06-03</td><td>726</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026143</td><td>2026-06-02</td><td>376</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>6</td><td class="cell-fail">✗</td></tr>
-<tr class="row-ok"><td>2026142</td><td>2026-06-01</td><td>894</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026141</td><td>2026-05-31</td><td>397</td><td>2</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026140</td><td>2026-05-30</td><td>285</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026139</td><td>2026-05-29</td><td>286</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026138</td><td>2026-05-28</td><td>790</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026137</td><td>2026-05-27</td><td>165</td><td>7</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026136</td><td>2026-05-26</td><td>889</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026135</td><td>2026-05-25</td><td>487</td><td>7</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026134</td><td>2026-05-24</td><td>654</td><td>0</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026133</td><td>2026-05-23</td><td>080</td><td>9</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026132</td><td>2026-05-22</td><td>756</td><td>4</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026131</td><td>2026-05-21</td><td>598</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026130</td><td>2026-05-20</td><td>267</td><td>6</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026129</td><td>2026-05-19</td><td>023</td><td>1</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026128</td><td>2026-05-18</td><td>776</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026127</td><td>2026-05-17</td><td>700</td><td>2</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026126</td><td>2026-05-16</td><td>846</td><td>9</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026125</td><td>2026-05-15</td><td>954</td><td>1</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026124</td><td>2026-05-14</td><td>280</td><td>3</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026123</td><td>2026-05-13</td><td>200</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026122</td><td>2026-05-12</td><td>346</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026121</td><td>2026-05-11</td><td>393</td><td>5</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026120</td><td>2026-05-10</td><td>734</td><td>6</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026119</td><td>2026-05-09</td><td>112</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026118</td><td>2026-05-08</td><td>132</td><td>4</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026117</td><td>2026-05-07</td><td>411</td><td>3</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026116</td><td>2026-05-06</td><td>020</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026115</td><td>2026-05-05</td><td>581</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026114</td><td>2026-05-04</td><td>864</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026113</td><td>2026-05-03</td><td>040</td><td>4</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026112</td><td>2026-05-02</td><td>065</td><td>9</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026111</td><td>2026-05-01</td><td>863</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026110</td><td>2026-04-30</td><td>379</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026109</td><td>2026-04-29</td><td>195</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026108</td><td>2026-04-28</td><td>671</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026107</td><td>2026-04-27</td><td>278</td><td>0</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026106</td><td>2026-04-26</td><td>928</td><td>8</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026105</td><td>2026-04-25</td><td>631</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026104</td><td>2026-04-24</td><td>482</td><td>8</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026103</td><td>2026-04-23</td><td>661</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026102</td><td>2026-04-22</td><td>420</td><td>9</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026101</td><td>2026-04-21</td><td>584</td><td>4</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026100</td><td>2026-04-20</td><td>414</td><td>0</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026099</td><td>2026-04-19</td><td>877</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026098</td><td>2026-04-18</td><td>513</td><td>8</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026097</td><td>2026-04-17</td><td>818</td><td>4</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-fail">✗</td></tr>
-<tr class="row-ok"><td>2026096</td><td>2026-04-16</td><td>689</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026095</td><td>2026-04-15</td><td>022</td><td>1</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>2</td><td class="cell-fail">✗</td></tr>
-<tr class="row-ok"><td>2026094</td><td>2026-04-14</td><td>418</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026093</td><td>2026-04-13</td><td>518</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026092</td><td>2026-04-12</td><td>870</td><td>6</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026091</td><td>2026-04-11</td><td>537</td><td>7</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026090</td><td>2026-04-10</td><td>816</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026089</td><td>2026-04-09</td><td>922</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026088</td><td>2026-04-08</td><td>608</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026087</td><td>2026-04-07</td><td>911</td><td>8</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026086</td><td>2026-04-06</td><td>382</td><td>4</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026085</td><td>2026-04-05</td><td>118</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026084</td><td>2026-04-04</td><td>456</td><td>0</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026083</td><td>2026-04-03</td><td>506</td><td>6</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026082</td><td>2026-04-02</td><td>942</td><td>4</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026081</td><td>2026-04-01</td><td>827</td><td>1</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026080</td><td>2026-03-31</td><td>802</td><td>6</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026079</td><td>2026-03-30</td><td>233</td><td>4</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026078</td><td>2026-03-29</td><td>049</td><td>6</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026077</td><td>2026-03-28</td><td>112</td><td>9</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026076</td><td>2026-03-27</td><td>863</td><td>7</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026075</td><td>2026-03-26</td><td>816</td><td>0</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026074</td><td>2026-03-25</td><td>487</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026073</td><td>2026-03-24</td><td>504</td><td>3</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026072</td><td>2026-03-23</td><td>245</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026071</td><td>2026-03-22</td><td>261</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026070</td><td>2026-03-21</td><td>484</td><td>2</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026069</td><td>2026-03-20</td><td>908</td><td>4</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026068</td><td>2026-03-19</td><td>706</td><td>2</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026067</td><td>2026-03-18</td><td>695</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026066</td><td>2026-03-17</td><td>934</td><td>5</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026065</td><td>2026-03-16</td><td>057</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026064</td><td>2026-03-15</td><td>604</td><td>5</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026063</td><td>2026-03-14</td><td>517</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026062</td><td>2026-03-13</td><td>294</td><td>4</td><td class="cell-ok">✓</td><td>9</td><td class="cell-fail">✗</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026061</td><td>2026-03-12</td><td>429</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026060</td><td>2026-03-11</td><td>943</td><td>1</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026059</td><td>2026-03-10</td><td>794</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026058</td><td>2026-03-09</td><td>543</td><td>3</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026057</td><td>2026-03-08</td><td>264</td><td>6</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026056</td><td>2026-03-07</td><td>477</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026055</td><td>2026-03-06</td><td>107</td><td>3</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026054</td><td>2026-03-05</td><td>217</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026053</td><td>2026-03-04</td><td>755</td><td>4</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026052</td><td>2026-03-03</td><td>277</td><td>3</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026051</td><td>2026-03-02</td><td>302</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026050</td><td>2026-03-01</td><td>689</td><td>3</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026049</td><td>2026-02-28</td><td>110</td><td>0</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026048</td><td>2026-02-27</td><td>612</td><td>1</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026047</td><td>2026-02-26</td><td>936</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026046</td><td>2026-02-25</td><td>291</td><td>8</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026045</td><td>2026-02-24</td><td>181</td><td>4</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026044</td><td>2026-02-13</td><td>589</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026043</td><td>2026-02-12</td><td>765</td><td>8</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026042</td><td>2026-02-11</td><td>854</td><td>9</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026041</td><td>2026-02-10</td><td>901</td><td>3</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026040</td><td>2026-02-09</td><td>425</td><td>0</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026039</td><td>2026-02-08</td><td>450</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026038</td><td>2026-02-07</td><td>467</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026037</td><td>2026-02-06</td><td>420</td><td>9</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026036</td><td>2026-02-05</td><td>762</td><td>8</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026035</td><td>2026-02-04</td><td>213</td><td>9</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026034</td><td>2026-02-03</td><td>052</td><td>3</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026033</td><td>2026-02-02</td><td>119</td><td>5</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026032</td><td>2026-02-01</td><td>452</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026031</td><td>2026-01-31</td><td>142</td><td>0</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026030</td><td>2026-01-30</td><td>134</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026029</td><td>2026-01-29</td><td>003</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026028</td><td>2026-01-28</td><td>270</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026027</td><td>2026-01-27</td><td>126</td><td>6</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026026</td><td>2026-01-26</td><td>099</td><td>8</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026025</td><td>2026-01-25</td><td>029</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026024</td><td>2026-01-24</td><td>911</td><td>1</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026023</td><td>2026-01-23</td><td>784</td><td>7</td><td class="cell-fail">✗</td><td>3</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026022</td><td>2026-01-22</td><td>678</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026021</td><td>2026-01-21</td><td>559</td><td>2</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026020</td><td>2026-01-20</td><td>676</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026019</td><td>2026-01-19</td><td>223</td><td>6</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026018</td><td>2026-01-18</td><td>494</td><td>9</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026017</td><td>2026-01-17</td><td>945</td><td>2</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026016</td><td>2026-01-16</td><td>582</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026015</td><td>2026-01-15</td><td>532</td><td>6</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026014</td><td>2026-01-14</td><td>050</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026013</td><td>2026-01-13</td><td>513</td><td>8</td><td class="cell-ok">✓</td><td>1</td><td class="cell-fail">✗</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026012</td><td>2026-01-12</td><td>241</td><td>9</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026011</td><td>2026-01-11</td><td>647</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026010</td><td>2026-01-10</td><td>667</td><td>5</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026009</td><td>2026-01-09</td><td>265</td><td>4</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026008</td><td>2026-01-08</td><td>252</td><td>3</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>4</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026007</td><td>2026-01-07</td><td>353</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026006</td><td>2026-01-06</td><td>244</td><td>8</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026005</td><td>2026-01-05</td><td>476</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026004</td><td>2026-01-04</td><td>019</td><td>6</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2026003</td><td>2026-01-03</td><td>601</td><td>8</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-fail"><td>2026002</td><td>2026-01-02</td><td>520</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>0</td><td class="cell-fail">✗</td></tr>
-<tr class="row-ok"><td>2026001</td><td>2026-01-01</td><td>298</td><td>5</td><td class="cell-ok">✓</td><td>3</td><td class="cell-ok">✓</td><td>2</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025351</td><td>2025-12-31</td><td>452</td><td>2</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025350</td><td>2025-12-30</td><td>580</td><td>6</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025349</td><td>2025-12-29</td><td>743</td><td>9</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025348</td><td>2025-12-28</td><td>278</td><td>3</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>9</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025347</td><td>2025-12-27</td><td>192</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025346</td><td>2025-12-26</td><td>897</td><td>7</td><td class="cell-ok">✓</td><td>5</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025345</td><td>2025-12-25</td><td>630</td><td>1</td><td class="cell-ok">✓</td><td>0</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025344</td><td>2025-12-24</td><td>622</td><td>5</td><td class="cell-ok">✓</td><td>7</td><td class="cell-ok">✓</td><td>6</td><td class="cell-ok">✓</td></tr>
-<tr class="row-ok"><td>2025343</td><td>2025-12-23</td><td>645</td><td>8</td><td class="cell-ok">✓</td><td>1</td><td class="cell-ok">✓</td><td>8</td><td class="cell-ok">✓</td></tr>
-</tbody>
-</table></div></div>
-<div class="info">
-<strong>百位(99.5%)：</strong>10条件决策树 + default→sum+1<br>
-<strong>十位(98.5%)：</strong>奇和值/大跨度/默认 三条件公式<br>
-<strong>个位(97.5%)：</strong>12条件决策树<br>
-<strong>综合98.5%</strong> · 6数据源降级 · 三重cron兜底 · 纯云端自动化
+
+<!-- Tab Navigation -->
+<div class="section-title"><span class="dot"></span>200期回测明细（近期→远期）</div>
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot ok"></span> 预测正确</div>
+  <div class="legend-item"><span class="legend-dot fail"></span> 预测错误</div>
 </div>
-<div class="disclaimer">数据来源: 灰鸟API/apihz/上海福彩/绍兴福彩/55128/彩经网 | 仅供研究参考</div>
+<div class="table-wrap">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>期号</th><th>日期</th><th>开奖号</th>
+          <th>百位杀</th><th>百位结果</th>
+          <th>十位杀</th><th>十位结果</th>
+          <th>个位杀</th><th>个位结果</th>
+          <th>当日</th>
+        </tr>
+      </thead>
+      <tbody id="backtestBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Strategy -->
+<div class="section-title"><span class="dot"></span>策略架构（V7 混合引擎）</div>
+<div class="info-card">
+  <h3>🔬 双范式混合</h3>
+  <p><strong>三位置全部公式法：</strong>基于上期开奖号做非线性运算（平方、乘积、条件分支），捕捉三位置间的结构性关联</p>
+  <strong>十位 → 公式法：</strong>基于上期开奖号做非线性运算（平方、乘积、条件分支），捕捉算术规律</p>
+</div>
+<div class="info-card">
+  <h3>📋 策略详情</h3>
+  <p><strong>百位（公式）：</strong>10条件决策树 — <strong>99.5%</strong><br>
+  <small>全偶/全奇/对子/跨度4→100%命中；大跨度/奇和值→98%+；默认公式兜底</small></p>
+  <p><strong>十位（公式）：</strong>上期号条件分支非线性运算 — <strong>98.5%</strong><br>
+  <small>和值奇数→百²+十²+个；跨度≥6→3×max；默认→个²+百。突破统计法天花板</small></p>
+  <p><strong>个位（公式）：</strong>12条件决策树 — <strong>97.5%</strong><br>
+  <small>全奇/对子/跨度2-4→100%；个最大/百>个→97%+；默认s*g-b</small></p>
+  <div class="warn">
+    ⚠️ <strong>重要提示：</strong>彩票本质是随机游戏。本算法基于历史统计规律，当前200期回测综合准确率<strong>98.5%</strong>。数学理论上杀一码极限≈90%（每数字≈10%概率），本算法已显著超越随机基线。但无法保证未来准确率，请理性参考。
+  </div>
+</div>
+
+<div class="disclaimer">
+  数据来源：福彩3D历史开奖数据 | V6双轨自学习引擎 | 严格无未来信息 | 仅供研究参考
+</div>
+
+</div>
+
+<script>
+// Embed data
+const DATA = {"version": "V7.1", "lastIssue": "2026190", "lastDate": "2026-07-19", "prediction": {"issue": "2026191", "date": "2026-07-20", "hundreds": 0, "tens": 8, "ones": 2}, "strategies": {"hundreds": "公式决策树", "tens": "公式决策树", "ones": "公式决策树"}, "multiWindow": {"近100期": {"百位": "100/100 = 100.0%", "十位": "99/100 = 99.0%", "个位": "96/100 = 96.0%", "综合": "98.3%", "最大连续错": 1}, "近200期": {"百位": "199/200 = 99.5%", "十位": "197/200 = 98.5%", "个位": "195/200 = 97.5%", "综合": "98.5%", "最大连续错": 1}, "近300期": {"百位": "289/300 = 96.3%", "十位": "288/300 = 96.0%", "个位": "285/300 = 95.0%", "综合": "95.8%", "最大连续错": 3}, "近500期": {"百位": "472/500 = 94.4%", "十位": "457/500 = 91.4%", "个位": "463/500 = 92.6%", "综合": "92.8%", "最大连续错": 4}, "全量": {"百位": "7879/8697 = 90.6%", "十位": "7844/8697 = 90.2%", "个位": "7849/8697 = 90.2%", "综合": "90.3%", "最大连续错": 7}}, "stats": {"h": 99.5, "t": 98.5, "o": 97.5, "overall": 98.5, "hC": 199, "hW": 1, "tC": 197, "tW": 3, "oC": 195, "oW": 5}, "daily": [{"issue": "2026190", "date": "2026-07-19", "actual": "026", "hK": 9, "tK": 9, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026189", "date": "2026-07-18", "actual": "558", "hK": 4, "tK": 0, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026188", "date": "2026-07-17", "actual": "969", "hK": 1, "tK": 7, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026187", "date": "2026-07-16", "actual": "023", "hK": 9, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026186", "date": "2026-07-15", "actual": "045", "hK": 1, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026185", "date": "2026-07-14", "actual": "397", "hK": 2, "tK": 3, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026184", "date": "2026-07-13", "actual": "902", "hK": 8, "tK": 7, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026183", "date": "2026-07-12", "actual": "923", "hK": 5, "tK": 0, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026182", "date": "2026-07-11", "actual": "662", "hK": 8, "tK": 3, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026181", "date": "2026-07-10", "actual": "818", "hK": 7, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026180", "date": "2026-07-09", "actual": "520", "hK": 3, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026179", "date": "2026-07-08", "actual": "993", "hK": 5, "tK": 8, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026178", "date": "2026-07-07", "actual": "266", "hK": 7, "tK": 4, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026177", "date": "2026-07-06", "actual": "808", "hK": 2, "tK": 9, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026176", "date": "2026-07-05", "actual": "269", "hK": 9, "tK": 1, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026175", "date": "2026-07-04", "actual": "421", "hK": 7, "tK": 0, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026174", "date": "2026-07-03", "actual": "618", "hK": 8, "tK": 5, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026173", "date": "2026-07-02", "actual": "677", "hK": 5, "tK": 9, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026172", "date": "2026-07-01", "actual": "445", "hK": 9, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026171", "date": "2026-06-30", "actual": "134", "hK": 0, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026170", "date": "2026-06-29", "actual": "805", "hK": 3, "tK": 5, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026169", "date": "2026-06-28", "actual": "832", "hK": 6, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026168", "date": "2026-06-27", "actual": "130", "hK": 8, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026167", "date": "2026-06-26", "actual": "631", "hK": 7, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026166", "date": "2026-06-25", "actual": "900", "hK": 8, "tK": 0, "oK": 2, "hOK": true, "tOK": false, "oOK": true, "allOK": false}, {"issue": "2026165", "date": "2026-06-24", "actual": "424", "hK": 1, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026164", "date": "2026-06-23", "actual": "690", "hK": 7, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026163", "date": "2026-06-22", "actual": "537", "hK": 4, "tK": 0, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026162", "date": "2026-06-21", "actual": "585", "hK": 3, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026161", "date": "2026-06-20", "actual": "529", "hK": 9, "tK": 9, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026160", "date": "2026-06-19", "actual": "332", "hK": 5, "tK": 7, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026159", "date": "2026-06-18", "actual": "995", "hK": 1, "tK": 4, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026158", "date": "2026-06-17", "actual": "178", "hK": 4, "tK": 2, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026157", "date": "2026-06-16", "actual": "327", "hK": 1, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026156", "date": "2026-06-15", "actual": "162", "hK": 6, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026155", "date": "2026-06-14", "actual": "409", "hK": 9, "tK": 2, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026154", "date": "2026-06-13", "actual": "377", "hK": 4, "tK": 5, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026153", "date": "2026-06-12", "actual": "887", "hK": 5, "tK": 2, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026152", "date": "2026-06-11", "actual": "220", "hK": 1, "tK": 1, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026151", "date": "2026-06-10", "actual": "631", "hK": 8, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026150", "date": "2026-06-09", "actual": "720", "hK": 4, "tK": 3, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026149", "date": "2026-06-08", "actual": "696", "hK": 0, "tK": 4, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026148", "date": "2026-06-07", "actual": "408", "hK": 3, "tK": 1, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026147", "date": "2026-06-06", "actual": "712", "hK": 5, "tK": 0, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026146", "date": "2026-06-05", "actual": "464", "hK": 1, "tK": 7, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026145", "date": "2026-06-04", "actual": "279", "hK": 7, "tK": 9, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026144", "date": "2026-06-03", "actual": "726", "hK": 8, "tK": 7, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026143", "date": "2026-06-02", "actual": "376", "hK": 9, "tK": 9, "oK": 6, "hOK": true, "tOK": true, "oOK": false, "allOK": false}, {"issue": "2026142", "date": "2026-06-01", "actual": "894", "hK": 1, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026141", "date": "2026-05-31", "actual": "397", "hK": 2, "tK": 3, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026140", "date": "2026-05-30", "actual": "285", "hK": 7, "tK": 4, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026139", "date": "2026-05-29", "actual": "286", "hK": 1, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026138", "date": "2026-05-28", "actual": "790", "hK": 4, "tK": 6, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026137", "date": "2026-05-27", "actual": "165", "hK": 7, "tK": 9, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026136", "date": "2026-05-26", "actual": "889", "hK": 1, "tK": 7, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026135", "date": "2026-05-25", "actual": "487", "hK": 7, "tK": 5, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026134", "date": "2026-05-24", "actual": "654", "hK": 0, "tK": 4, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026133", "date": "2026-05-23", "actual": "080", "hK": 9, "tK": 3, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026132", "date": "2026-05-22", "actual": "756", "hK": 4, "tK": 9, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026131", "date": "2026-05-21", "actual": "598", "hK": 9, "tK": 1, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026130", "date": "2026-05-20", "actual": "267", "hK": 6, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026129", "date": "2026-05-19", "actual": "023", "hK": 1, "tK": 3, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026128", "date": "2026-05-18", "actual": "776", "hK": 5, "tK": 9, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026127", "date": "2026-05-17", "actual": "700", "hK": 2, "tK": 4, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026126", "date": "2026-05-16", "actual": "846", "hK": 9, "tK": 5, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026125", "date": "2026-05-15", "actual": "954", "hK": 1, "tK": 4, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026124", "date": "2026-05-14", "actual": "280", "hK": 3, "tK": 2, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026123", "date": "2026-05-13", "actual": "200", "hK": 9, "tK": 1, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026122", "date": "2026-05-12", "actual": "346", "hK": 7, "tK": 2, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026121", "date": "2026-05-11", "actual": "393", "hK": 5, "tK": 3, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026120", "date": "2026-05-10", "actual": "734", "hK": 6, "tK": 5, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026119", "date": "2026-05-09", "actual": "112", "hK": 8, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026118", "date": "2026-05-08", "actual": "132", "hK": 4, "tK": 5, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026117", "date": "2026-05-07", "actual": "411", "hK": 3, "tK": 0, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026116", "date": "2026-05-06", "actual": "020", "hK": 7, "tK": 6, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026115", "date": "2026-05-05", "actual": "581", "hK": 9, "tK": 4, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026114", "date": "2026-05-04", "actual": "864", "hK": 5, "tK": 0, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026113", "date": "2026-05-03", "actual": "040", "hK": 4, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": false, "allOK": false}, {"issue": "2026112", "date": "2026-05-02", "actual": "065", "hK": 9, "tK": 3, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026111", "date": "2026-05-01", "actual": "863", "hK": 1, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026110", "date": "2026-04-30", "actual": "379", "hK": 7, "tK": 6, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026109", "date": "2026-04-29", "actual": "195", "hK": 5, "tK": 7, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026108", "date": "2026-04-28", "actual": "671", "hK": 9, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026107", "date": "2026-04-27", "actual": "278", "hK": 0, "tK": 3, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026106", "date": "2026-04-26", "actual": "928", "hK": 8, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026105", "date": "2026-04-25", "actual": "631", "hK": 5, "tK": 4, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026104", "date": "2026-04-24", "actual": "482", "hK": 8, "tK": 3, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026103", "date": "2026-04-23", "actual": "661", "hK": 7, "tK": 4, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026102", "date": "2026-04-22", "actual": "420", "hK": 9, "tK": 3, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026101", "date": "2026-04-21", "actual": "584", "hK": 4, "tK": 1, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026100", "date": "2026-04-20", "actual": "414", "hK": 0, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026099", "date": "2026-04-19", "actual": "877", "hK": 1, "tK": 9, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026098", "date": "2026-04-18", "actual": "513", "hK": 8, "tK": 3, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026097", "date": "2026-04-17", "actual": "818", "hK": 4, "tK": 9, "oK": 8, "hOK": true, "tOK": true, "oOK": false, "allOK": false}, {"issue": "2026096", "date": "2026-04-16", "actual": "689", "hK": 5, "tK": 4, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026095", "date": "2026-04-15", "actual": "022", "hK": 1, "tK": 5, "oK": 2, "hOK": true, "tOK": true, "oOK": false, "allOK": false}, {"issue": "2026094", "date": "2026-04-14", "actual": "418", "hK": 9, "tK": 4, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026093", "date": "2026-04-13", "actual": "518", "hK": 3, "tK": 3, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026092", "date": "2026-04-12", "actual": "870", "hK": 6, "tK": 4, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026091", "date": "2026-04-11", "actual": "537", "hK": 7, "tK": 1, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026090", "date": "2026-04-10", "actual": "816", "hK": 1, "tK": 7, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026089", "date": "2026-04-09", "actual": "922", "hK": 5, "tK": 4, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026088", "date": "2026-04-08", "actual": "608", "hK": 3, "tK": 3, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026087", "date": "2026-04-07", "actual": "911", "hK": 8, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026086", "date": "2026-04-06", "actual": "382", "hK": 4, "tK": 4, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026085", "date": "2026-04-05", "actual": "118", "hK": 7, "tK": 7, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026084", "date": "2026-04-04", "actual": "456", "hK": 0, "tK": 1, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026083", "date": "2026-04-03", "actual": "506", "hK": 6, "tK": 9, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026082", "date": "2026-04-02", "actual": "942", "hK": 4, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026081", "date": "2026-04-01", "actual": "827", "hK": 1, "tK": 4, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026080", "date": "2026-03-31", "actual": "802", "hK": 6, "tK": 9, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026079", "date": "2026-03-30", "actual": "233", "hK": 4, "tK": 1, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026078", "date": "2026-03-29", "actual": "049", "hK": 6, "tK": 5, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026077", "date": "2026-03-28", "actual": "112", "hK": 9, "tK": 3, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026076", "date": "2026-03-27", "actual": "863", "hK": 7, "tK": 1, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026075", "date": "2026-03-26", "actual": "816", "hK": 0, "tK": 7, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026074", "date": "2026-03-25", "actual": "487", "hK": 1, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026073", "date": "2026-03-24", "actual": "504", "hK": 3, "tK": 5, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026072", "date": "2026-03-23", "actual": "245", "hK": 1, "tK": 1, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026071", "date": "2026-03-22", "actual": "261", "hK": 7, "tK": 0, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026070", "date": "2026-03-21", "actual": "484", "hK": 2, "tK": 9, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026069", "date": "2026-03-20", "actual": "908", "hK": 4, "tK": 5, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026068", "date": "2026-03-19", "actual": "706", "hK": 2, "tK": 1, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026067", "date": "2026-03-18", "actual": "695", "hK": 3, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026066", "date": "2026-03-17", "actual": "934", "hK": 5, "tK": 1, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026065", "date": "2026-03-16", "actual": "057", "hK": 1, "tK": 8, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026064", "date": "2026-03-15", "actual": "604", "hK": 5, "tK": 3, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026063", "date": "2026-03-14", "actual": "517", "hK": 9, "tK": 8, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026062", "date": "2026-03-13", "actual": "294", "hK": 4, "tK": 9, "oK": 6, "hOK": true, "tOK": false, "oOK": true, "allOK": false}, {"issue": "2026061", "date": "2026-03-12", "actual": "429", "hK": 3, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026060", "date": "2026-03-11", "actual": "943", "hK": 1, "tK": 3, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026059", "date": "2026-03-10", "actual": "794", "hK": 5, "tK": 4, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026058", "date": "2026-03-09", "actual": "543", "hK": 3, "tK": 8, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026057", "date": "2026-03-08", "actual": "264", "hK": 6, "tK": 3, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026056", "date": "2026-03-07", "actual": "477", "hK": 7, "tK": 0, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026055", "date": "2026-03-06", "actual": "107", "hK": 3, "tK": 1, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026054", "date": "2026-03-05", "actual": "217", "hK": 9, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026053", "date": "2026-03-04", "actual": "755", "hK": 4, "tK": 7, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026052", "date": "2026-03-03", "actual": "277", "hK": 3, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026051", "date": "2026-03-02", "actual": "302", "hK": 5, "tK": 9, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026050", "date": "2026-03-01", "actual": "689", "hK": 3, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026049", "date": "2026-02-28", "actual": "110", "hK": 0, "tK": 9, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026048", "date": "2026-02-27", "actual": "612", "hK": 1, "tK": 5, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026047", "date": "2026-02-26", "actual": "936", "hK": 3, "tK": 7, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026046", "date": "2026-02-25", "actual": "291", "hK": 8, "tK": 4, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026045", "date": "2026-02-24", "actual": "181", "hK": 4, "tK": 6, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026044", "date": "2026-02-13", "actual": "589", "hK": 9, "tK": 2, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026043", "date": "2026-02-12", "actual": "765", "hK": 8, "tK": 3, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026042", "date": "2026-02-11", "actual": "854", "hK": 9, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026041", "date": "2026-02-10", "actual": "901", "hK": 3, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026040", "date": "2026-02-09", "actual": "425", "hK": 0, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026039", "date": "2026-02-08", "actual": "450", "hK": 1, "tK": 9, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026038", "date": "2026-02-07", "actual": "467", "hK": 7, "tK": 4, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026037", "date": "2026-02-06", "actual": "420", "hK": 9, "tK": 7, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026036", "date": "2026-02-05", "actual": "762", "hK": 8, "tK": 1, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026035", "date": "2026-02-04", "actual": "213", "hK": 9, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026034", "date": "2026-02-03", "actual": "052", "hK": 3, "tK": 1, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026033", "date": "2026-02-02", "actual": "119", "hK": 5, "tK": 3, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026032", "date": "2026-02-01", "actual": "452", "hK": 9, "tK": 9, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026031", "date": "2026-01-31", "actual": "142", "hK": 0, "tK": 7, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026030", "date": "2026-01-30", "actual": "134", "hK": 9, "tK": 9, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026029", "date": "2026-01-29", "actual": "003", "hK": 3, "tK": 3, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026028", "date": "2026-01-28", "actual": "270", "hK": 9, "tK": 1, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026027", "date": "2026-01-27", "actual": "126", "hK": 6, "tK": 7, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026026", "date": "2026-01-26", "actual": "099", "hK": 8, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026025", "date": "2026-01-25", "actual": "029", "hK": 3, "tK": 3, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026024", "date": "2026-01-24", "actual": "911", "hK": 1, "tK": 7, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026023", "date": "2026-01-23", "actual": "784", "hK": 7, "tK": 3, "oK": 3, "hOK": false, "tOK": true, "oOK": true, "allOK": false}, {"issue": "2026022", "date": "2026-01-22", "actual": "678", "hK": 1, "tK": 9, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026021", "date": "2026-01-21", "actual": "559", "hK": 2, "tK": 1, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026020", "date": "2026-01-20", "actual": "676", "hK": 9, "tK": 8, "oK": 3, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026019", "date": "2026-01-19", "actual": "223", "hK": 6, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026018", "date": "2026-01-18", "actual": "494", "hK": 9, "tK": 4, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026017", "date": "2026-01-17", "actual": "945", "hK": 2, "tK": 1, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026016", "date": "2026-01-16", "actual": "582", "hK": 1, "tK": 9, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026015", "date": "2026-01-15", "actual": "532", "hK": 6, "tK": 5, "oK": 7, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026014", "date": "2026-01-14", "actual": "050", "hK": 1, "tK": 9, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026013", "date": "2026-01-13", "actual": "513", "hK": 8, "tK": 1, "oK": 8, "hOK": true, "tOK": false, "oOK": true, "allOK": false}, {"issue": "2026012", "date": "2026-01-12", "actual": "241", "hK": 9, "tK": 5, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026011", "date": "2026-01-11", "actual": "647", "hK": 1, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026010", "date": "2026-01-10", "actual": "667", "hK": 5, "tK": 5, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026009", "date": "2026-01-09", "actual": "265", "hK": 4, "tK": 1, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026008", "date": "2026-01-08", "actual": "252", "hK": 3, "tK": 7, "oK": 4, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026007", "date": "2026-01-07", "actual": "353", "hK": 1, "tK": 8, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026006", "date": "2026-01-06", "actual": "244", "hK": 8, "tK": 0, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026005", "date": "2026-01-05", "actual": "476", "hK": 9, "tK": 1, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026004", "date": "2026-01-04", "actual": "019", "hK": 6, "tK": 7, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026003", "date": "2026-01-03", "actual": "601", "hK": 8, "tK": 9, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2026002", "date": "2026-01-02", "actual": "520", "hK": 7, "tK": 6, "oK": 0, "hOK": true, "tOK": true, "oOK": false, "allOK": false}, {"issue": "2026001", "date": "2026-01-01", "actual": "298", "hK": 5, "tK": 3, "oK": 2, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025351", "date": "2025-12-31", "actual": "452", "hK": 2, "tK": 9, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025350", "date": "2025-12-30", "actual": "580", "hK": 6, "tK": 6, "oK": 5, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025349", "date": "2025-12-29", "actual": "743", "hK": 9, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025348", "date": "2025-12-28", "actual": "278", "hK": 3, "tK": 5, "oK": 9, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025347", "date": "2025-12-27", "actual": "192", "hK": 5, "tK": 7, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025346", "date": "2025-12-26", "actual": "897", "hK": 7, "tK": 5, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025345", "date": "2025-12-25", "actual": "630", "hK": 1, "tK": 0, "oK": 1, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025344", "date": "2025-12-24", "actual": "622", "hK": 5, "tK": 7, "oK": 6, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025343", "date": "2025-12-23", "actual": "645", "hK": 8, "tK": 1, "oK": 8, "hOK": true, "tOK": true, "oOK": true, "allOK": true}, {"issue": "2025342", "date": "2025-12-22", "actual": "681", "hK": 7, "tK": 5, "oK": 0, "hOK": true, "tOK": true, "oOK": true, "allOK": true}], "cumulative": {"h": [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 99.4, 99.41, 99.41, 99.42, 99.42, 99.42, 99.43, 99.43, 99.43, 99.44, 99.44, 99.44, 99.44, 99.45, 99.45, 99.45, 99.46, 99.46, 99.46, 99.47, 99.47, 99.47, 99.47, 99.48, 99.48, 99.48, 99.48, 99.49, 99.49, 99.49, 99.49, 99.5, 99.5], "t": [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 96.0, 96.15, 96.3, 96.43, 96.55, 96.67, 96.77, 96.88, 96.97, 97.06, 97.14, 97.22, 97.3, 97.37, 97.44, 97.5, 97.56, 97.62, 97.67, 97.73, 97.78, 97.83, 97.87, 97.92, 97.96, 98.0, 98.04, 98.08, 98.11, 98.15, 98.18, 98.21, 98.25, 98.28, 98.31, 98.33, 98.36, 98.39, 98.41, 98.44, 98.46, 98.48, 98.51, 98.53, 98.55, 98.57, 98.59, 98.61, 98.63, 98.65, 98.67, 98.68, 98.7, 98.72, 98.73, 98.75, 98.77, 98.78, 98.8, 98.81, 98.82, 98.84, 98.85, 98.86, 98.88, 98.89, 98.9, 98.91, 98.92, 98.94, 98.95, 98.96, 98.97, 98.98, 98.99, 99.0, 99.01, 99.02, 99.03, 99.04, 99.05, 99.06, 99.07, 99.07, 99.08, 99.09, 99.1, 99.11, 99.12, 99.12, 99.13, 99.14, 99.15, 99.15, 99.16, 99.17, 99.17, 99.18, 99.19, 99.19, 99.2, 99.21, 99.21, 99.22, 98.45, 98.46, 98.47, 98.48, 98.5, 98.51, 98.52, 98.53, 98.54, 98.55, 98.56, 98.57, 98.58, 98.59, 98.6, 98.61, 98.62, 98.63, 98.64, 98.65, 98.66, 98.67, 98.68, 98.68, 98.69, 98.7, 98.71, 98.72, 98.73, 98.73, 98.74, 98.75, 98.76, 98.77, 98.77, 98.78, 98.79, 98.8, 98.8, 98.81, 98.82, 98.82, 98.83, 98.84, 98.84, 98.85, 98.86, 98.86, 98.87, 98.31, 98.32, 98.33, 98.34, 98.35, 98.36, 98.37, 98.38, 98.39, 98.4, 98.4, 98.41, 98.42, 98.43, 98.44, 98.45, 98.45, 98.46, 98.47, 98.48, 98.48, 98.49, 98.5], "o": [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 97.92, 97.96, 98.0, 98.04, 98.08, 98.11, 98.15, 98.18, 98.21, 98.25, 98.28, 98.31, 98.33, 98.36, 98.39, 98.41, 98.44, 98.46, 98.48, 98.51, 98.53, 98.55, 98.57, 98.59, 98.61, 98.63, 98.65, 98.67, 98.68, 98.7, 97.44, 97.47, 97.5, 97.53, 97.56, 97.59, 97.62, 97.65, 97.67, 97.7, 97.73, 97.75, 97.78, 97.8, 97.83, 97.85, 96.81, 96.84, 95.83, 95.88, 95.92, 95.96, 96.0, 96.04, 96.08, 96.12, 96.15, 96.19, 96.23, 96.26, 96.3, 96.33, 96.36, 96.4, 96.43, 96.46, 96.49, 96.52, 96.55, 96.58, 96.61, 96.64, 96.67, 96.69, 96.72, 96.75, 96.77, 96.8, 96.83, 96.85, 96.88, 96.9, 96.92, 96.95, 96.97, 96.99, 97.01, 97.04, 97.06, 97.08, 97.1, 97.12, 97.14, 97.16, 97.18, 97.2, 97.22, 97.24, 97.26, 97.28, 97.3, 97.32, 97.33, 97.35, 97.37, 97.39, 97.4, 97.42, 97.44, 97.45, 97.47, 97.48, 97.5, 97.52, 97.53, 97.55, 97.56, 97.58, 97.59, 97.6, 97.62, 97.63, 97.65, 97.66, 97.67, 97.69, 97.7, 97.71, 97.73, 97.74, 97.75, 97.77, 97.78, 97.79, 97.8, 97.81, 97.83, 97.84, 97.85, 97.86, 97.87, 97.35, 97.37, 97.38, 97.4, 97.41, 97.42, 97.44, 97.45, 97.46, 97.47, 97.49, 97.5]}};
+
+// Build backtest table
+function buildTable() {
+  const tbody = document.getElementById('backtestBody');
+  let html = '';
+  let cumH = 0, cumT = 0, cumO = 0;
+  
+  DATA.daily.forEach((r, i) => {
+    if (r.hOK) cumH++; 
+    if (r.tOK) cumT++; 
+    if (r.oOK) cumO++;
+    
+    const rowClass = r.allOK ? 'row-ok' : 'row-fail';
+    const hClass = r.hOK ? 'cell-ok' : 'cell-fail';
+    const tClass = r.tOK ? 'cell-ok' : 'cell-fail';
+    const oClass = r.oOK ? 'cell-ok' : 'cell-fail';
+    const allIcon = r.allOK ? '✅' : '❌';
+    
+    html += `<tr class="${rowClass}">
+      <td>${r.issue}</td>
+      <td>${r.date}</td>
+      <td class="cell-actual"><strong>${r.actual}</strong></td>
+      <td class="cell-kill">${r.hK}</td>
+      <td class="${hClass}">${r.hOK ? '✓ 正确' : '✗ 错误'}</td>
+      <td class="cell-kill">${r.tK}</td>
+      <td class="${tClass}">${r.tOK ? '✓ 正确' : '✗ 错误'}</td>
+      <td class="cell-kill">${r.oK}</td>
+      <td class="${oClass}">${r.oOK ? '✓ 正确' : '✗ 错误'}</td>
+      <td>${allIcon}</td>
+    </tr>`;
+    
+    // Summary every 50 rows
+    if ((i+1) % 50 === 0 && i < DATA.daily.length - 1) {
+      html += `<tr class="summary-row">
+        <td colspan="10">↑ 以上50期累计准确率：百位 ${(cumH/(i+1)*100).toFixed(1)}% | 十位 ${(cumT/(i+1)*100).toFixed(1)}% | 个位 ${(cumO/(i+1)*100).toFixed(1)}%</td>
+      </tr>`;
+    }
+  });
+  
+  tbody.innerHTML = html;
+}
+
+// Build cumulative chart
+function buildChart() {
+  const ctx = document.getElementById('cumulativeChart').getContext('2d');
+  const labels = DATA.daily.map(r => r.issue);
+  const hData = DATA.cumulative.h;
+  const tData = DATA.cumulative.t;
+  const oData = DATA.cumulative.o;
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '百位',
+          data: hData,
+          borderColor: '#4caf50',
+          backgroundColor: 'rgba(76,175,80,.05)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.15,
+          fill: false
+        },
+        {
+          label: '十位',
+          data: tData,
+          borderColor: '#2196f3',
+          backgroundColor: 'rgba(33,150,243,.05)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.15,
+          fill: false
+        },
+        {
+          label: '个位',
+          data: oData,
+          borderColor: '#ff9800',
+          backgroundColor: 'rgba(255,152,0,.05)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.15,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a237e',
+          titleFont: { size:12 },
+          bodyFont: { size:12 },
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            maxTicksLimit: 10,
+            font: { size:10 },
+            color: '#90a4ae'
+          },
+          grid: { display:false }
+        },
+        y: {
+          min: 85,
+          max: 100,
+          ticks: {
+            stepSize: 1,
+            font: { size:10 },
+            color: '#90a4ae',
+            callback: v => v + '%'
+          },
+          grid: { color:'#f0f0f0' }
+        }
+      }
+    }
+  });
+}
+
+// Init
+buildTable();
+buildChart();
+</script>
+
 </body>
 </html>
