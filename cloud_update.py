@@ -240,8 +240,9 @@ def compute_backtest(data):
     return {
         "meta": {
             "total": total, "latest_issue": last["issue"], "latest_date": last["date"],
-            "next_issue": next_issue, "backtest_n": BACKTEST_N,
+            "next_issue": next_issue, "backtest_n": n,
             "acc_h": cor["h"]/n*100, "acc_t": cor["t"]/n*100, "acc_o": cor["o"]/n*100,
+            "err_h": n - cor["h"], "err_t": n - cor["t"], "err_o": n - cor["o"],
             "acc_all": (cor["h"]+cor["t"]+cor["o"])/(n*3)*100
         },
         "predictions": next_kill,
@@ -272,6 +273,7 @@ body{{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backg
 .stat{{background:#fff;border-radius:10px;padding:14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}}
 .stat .sl{{font-size:11px;color:#90a4ae;margin-bottom:4px}}
 .stat .sv{{font-size:26px;font-weight:800}}
+.stat .se{{font-size:10px;color:#90a4ae;margin-top:2px}}
 .stat:nth-child(1) .sv{{color:#2e7d32}}
 .stat:nth-child(2) .sv{{color:#1565c0}}
 .stat:nth-child(3) .sv{{color:#e65100}}
@@ -307,9 +309,9 @@ td{{padding:6px 4px;text-align:center;border-bottom:1px solid #f0f0f0;font-size:
 </div>
 <div class="section-title">近{backtest_n}期回测准确率</div>
 <div class="stats">
-<div class="stat"><div class="sl">百位</div><div class="sv">{acc_h:.1f}%</div></div>
-<div class="stat"><div class="sl">十位</div><div class="sv">{acc_t:.1f}%</div></div>
-<div class="stat"><div class="sl">个位</div><div class="sv">{acc_o:.1f}%</div></div>
+<div class="stat"><div class="sl">百位</div><div class="sv">{acc_h:.1f}%</div><div class="se">错{err_h}期</div></div>
+<div class="stat"><div class="sl">十位</div><div class="sv">{acc_t:.1f}%</div><div class="se">错{err_t}期</div></div>
+<div class="stat"><div class="sl">个位</div><div class="sv">{acc_o:.1f}%</div><div class="se">错{err_o}期</div></div>
 </div>
 <div class="section-title">回测明细（近期→远期）</div>
 <div class="table-wrap"><div class="table-scroll"><table>
@@ -351,6 +353,7 @@ def generate_html(data, backtest_data):
         hk=pred["h"], tk=pred["t"], ok=pred["o"],
         backtest_n=meta["backtest_n"],
         acc_h=meta["acc_h"], acc_t=meta["acc_t"], acc_o=meta["acc_o"],
+        err_h=meta["err_h"], err_t=meta["err_t"], err_o=meta["err_o"],
         table_rows=table_rows
     )
 
