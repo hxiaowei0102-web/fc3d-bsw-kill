@@ -64,7 +64,7 @@ def kill_o(b, s, g):
     if b==s or s==g or b==g:          return (b*s + g) % 10
     if b+s+g >= 15:                   return (b*s + s*g) % 10
     if (b+s+g) % 2 == 0:             return (s*g + b) % 10
-    if (b+s+g) % 2 == 1:             return (g*g * s) % 10
+    if (b+s+g) % 2 == 1:             return (b+s+g+1) % 10        # V8: sum_odd→sum+1 (训练集验证93.1% vs 92.0%)
     return (s*g - b) % 10
 
 O_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
