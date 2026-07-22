@@ -51,7 +51,10 @@ T_FB = [lambda b,s,g:(g*g+b)%10, lambda b,s,g:(b+s+g+1)%10,
         lambda b,s,g:max(b,s,g)-min(b,s,g), lambda b,s,g:(b*g)%10,
         lambda b,s,g:(b+s)%10, lambda b,s,g:(b*s)%10]
 
-def kill_o(b, s, g):
+# ── V8 个位: 自适应故障切换 ──────────────────────────
+O_FAIL_WIN = 5
+
+def kill_o_v7(b, s, g):
     span = max(b,s,g) - min(b,s,g)
     if b%2==1 and s%2==1 and g%2==1:  return (b+s+g+3) % 10
     if b == s:                         return (b+s+g+6) % 10
@@ -66,6 +69,39 @@ def kill_o(b, s, g):
     if (b+s+g) % 2 == 0:             return (s*g + b) % 10
     if (b+s+g) % 2 == 1:             return (g*g * s) % 10
     return (s*g - b) % 10
+
+O_BACKUP = {
+    'g_max': lambda b,s,g: (3*max(b,s,g)) % 10,
+    'b_gt_g': lambda b,s,g: (b*b + g) % 10,
+    'sum_hi': lambda b,s,g: (b+s+g+3) % 10,
+    'sum_odd': lambda b,s,g: (b+s+g+1) % 10,
+    'default': lambda b,s,g: (b+s+g+1) % 10,
+}
+
+def get_o_cond(b,s,g):
+    sp = max(b,s,g)-min(b,s,g)
+    if b%2==1 and s%2==1 and g%2==1: return 'all_odd'
+    if b==s: return 'b_eq_s'
+    if b==g: return 'b_eq_g'
+    if s==g: return 's_eq_g'
+    if sp==4: return 'span4'
+    if sp==2: return 'span2'
+    if g==max(b,s,g): return 'g_max'
+    if b>g: return 'b_gt_g'
+    if b==s or s==g or b==g: return 'pair'
+    if b+s+g>=15: return 'sum_hi'
+    if (b+s+g)%2==0: return 'sum_even'
+    if (b+s+g)%2==1: return 'sum_odd'
+    return 'default'
+
+def kill_o(b, s, g, fail_state=None, period_idx=None):
+    pk = kill_o_v7(b, s, g)
+    if fail_state is not None and period_idx is not None:
+        cn = get_o_cond(b, s, g)
+        if cn in fail_state and period_idx - fail_state[cn] <= O_FAIL_WIN:
+            if cn in O_BACKUP:
+                pk = O_BACKUP[cn](b, s, g) % 10
+    return pk
 
 O_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
 
@@ -206,13 +242,16 @@ def compute_backtest(data):
 
     # 统一回测: 从头到尾walk-forward, 同时记录回测和累积最后状态
     phk = ptk = pok = None
+    o_fail = {}  # V8
     cor = {"h":0,"t":0,"o":0}
     results = []
     for i in range(1, total):
         p = data[i-1]; b,s,g = p["b"],p["s"],p["g"]
         phk = kill_h(b,s,g) if phk is None else apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g)
         ptk = kill_t(b,s,g) if ptk is None else apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g)
-        pok = kill_o(b,s,g) if pok is None else apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g)
+        pok_raw = kill_o(b, s, g, o_fail, i)
+        pok = pok_raw if pok is None else apply_fb(pok_raw, pok, O_FB, b,s,g)
+        if pok is None: pok = pok_raw
         
         if i >= start:
             cr = data[i]
@@ -226,14 +265,20 @@ def compute_backtest(data):
                 "hK": phk, "tK": ptk, "oK": pok,
                 "hOK": ho, "tOK": to, "oOK": oo, "allOK": ho and to and oo
             })
+        
+        # V8: 个位失败追踪
+        if pok == data[i]["g"]:
+            cn = get_o_cond(b, s, g)
+            o_fail[cn] = i
     results.reverse()
 
-    # 下一期预测: 使用回测累积的fallback状态 (phk/ptk/pok 已走到data[-1])
+    # V8 下一期预测
     lb = data[-1]; b,s,g = lb["b"],lb["s"],lb["g"]
+    next_o_raw = kill_o(b, s, g, o_fail, total)
     next_kill = {
         "h": apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g),
         "t": apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g),
-        "o": apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g),
+        "o": apply_fb(next_o_raw, pok, O_FB, b,s,g),
     }
 
     n = len(results)
