@@ -1,7 +1,7 @@
 """
 福彩3D 百十个杀码 — 云端全自动更新
 =============================================
-6数据源降级获取 → 追加CSV → V8引擎回测 → 生成HTML → GitHub Pages
+6数据源降级获取 → 追加CSV → V7引擎回测 → 生成HTML → GitHub Pages
 三重cron兜底: 北京22:00/23:30/01:00 (UTC 14:00/15:30/17:00)
 """
 import csv, json, os, re, sys, io
@@ -345,7 +345,7 @@ td{{padding:6px 4px;text-align:center;border-bottom:1px solid #f0f0f0;font-size:
 </head>
 <body>
 <div class="header">
-<h1>福彩3D 百十个杀码预测 V8</h1>
+<h1>福彩3D 百十个杀码预测 V7</h1>
 <div class="sub">{update_time} · {total}期数据 · 公式引擎</div>
 </div>
 <div class="pred">
@@ -416,7 +416,7 @@ def generate_html(data, backtest_data):
 # ── MAIN ──────────────────────────────────────────────
 if __name__ == '__main__':
     print("="*50)
-    print("福彩3D 百十个杀码 · 云端更新 V8")
+    print("福彩3D 百十个杀码 · 云端更新 V7")
     print("="*50)
     
     # Step 1: 同步数据
