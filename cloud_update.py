@@ -10,7 +10,7 @@ from datetime import datetime, timezone, timedelta
 # ── 配置 ──────────────────────────────────────────────
 CSV_PATH = "fc3d-history.csv"
 OUT_HTML = "index.html"
-BACKTEST_N = 200
+BACKTEST_N = 100
 TZ = timezone(timedelta(hours=8))
 
 def load_csv(path):
