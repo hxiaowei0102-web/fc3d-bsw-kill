@@ -237,13 +237,18 @@ def compute_backtest(data):
     }
 
     n = len(results)
+    # 近100期按"期"统计: 一期三个位置全对才算该期正确
+    period_correct_100 = sum(1 for r in results[:100] if r["allOK"])
+    n100 = min(100, n)
     return {
         "meta": {
             "total": total, "latest_issue": last["issue"], "latest_date": last["date"],
             "next_issue": next_issue, "backtest_n": n,
             "acc_h": cor["h"]/n*100, "acc_t": cor["t"]/n*100, "acc_o": cor["o"]/n*100,
             "err_h": n - cor["h"], "err_t": n - cor["t"], "err_o": n - cor["o"],
-            "acc_all": (cor["h"]+cor["t"]+cor["o"])/(n*3)*100
+            "acc_all": (cor["h"]+cor["t"]+cor["o"])/(n*3)*100,
+            "acc_period_100": period_correct_100 / n100 * 100,
+            "period_correct_100": period_correct_100, "period_n_100": n100,
         },
         "predictions": next_kill,
         "results": results
@@ -313,6 +318,10 @@ td{{padding:6px 4px;text-align:center;border-bottom:1px solid #f0f0f0;font-size:
 <div class="stat"><div class="sl">十位</div><div class="sv">{acc_t:.1f}%</div><div class="se">错{err_t}期</div></div>
 <div class="stat"><div class="sl">个位</div><div class="sv">{acc_o:.1f}%</div><div class="se">错{err_o}期</div></div>
 </div>
+<div class="section-title">近{period_n_100}期综合（按「期」统计）</div>
+<div class="stats">
+<div class="stat" style="grid-column:1/-1;border-top:3px solid #4caf50"><div class="sl">三位置全对才算一期正确</div><div class="sv" style="font-size:30px">{period_correct_100}/{period_n_100}期 = {acc_period_100:.1f}%</div></div>
+</div>
 <div class="section-title">回测明细（近期→远期）</div>
 <div class="table-wrap"><div class="table-scroll"><table>
 <thead><tr><th>期号</th><th>日期</th><th>开奖</th><th>百杀</th><th>百</th><th>十杀</th><th>十</th><th>个杀</th><th>个</th></tr></thead>
@@ -354,6 +363,8 @@ def generate_html(data, backtest_data):
         backtest_n=meta["backtest_n"],
         acc_h=meta["acc_h"], acc_t=meta["acc_t"], acc_o=meta["acc_o"],
         err_h=meta["err_h"], err_t=meta["err_t"], err_o=meta["err_o"],
+        period_correct_100=meta["period_correct_100"], period_n_100=meta["period_n_100"],
+        acc_period_100=meta["acc_period_100"],
         table_rows=table_rows
     )
 
