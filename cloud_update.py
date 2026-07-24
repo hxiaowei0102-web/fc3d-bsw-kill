@@ -38,7 +38,10 @@ def fetch_latest():
     sources = [
         ("灰鸟API", lambda: fetch_huiniao()),
         ("apihz", lambda: fetch_apihz()),
+        ("中彩网", lambda: fetch_zhcw()),
+        ("8200", lambda: fetch_8200()),
         ("55128", lambda: fetch_55128()),
+        ("彩经网", lambda: fetch_caijing()),
     ]
 
     for name, fn in sources:
@@ -78,6 +81,44 @@ def fetch_55128():
     m = re.search(r'<tr[^>]*>\s*<td[^>]*>(\d{7})</td>\s*<td[^>]*>([^<]+)</td>\s*<td[^>]*>\s*(?:<span[^>]*>)\s*(\d)\s*(?:</span>)\s*(?:<span[^>]*>)\s*(\d)\s*(?:</span>)\s*(?:<span[^>]*>)\s*(\d)', text)
     if not m:
         m = re.search(r'(\d{7}).*?(\d{4}-\d{2}-\d{2}).*?(\d)\s+(\d)\s+(\d)', text, re.DOTALL)
+    if not m: return None
+    return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
+
+# ── 新增数据源 ────────────────────────────────────────
+def fetch_zhcw():
+    """中彩网 - 官方福彩数据"""
+    url = "https://www.zhcw.com/kjxx/fc3d/"
+    text = http_get(url)
+    if not text: return None
+    m = re.search(r'<em>(\d{7})</em>.*?<em>(\d{4}-\d{2}-\d{2})</em>.*?<i>(\d)</i>\s*<i>(\d)</i>\s*<i>(\d)</i>', text, re.DOTALL)
+    if not m:
+        m = re.search(r'(\d{7})期.*?(\d{4}-\d{2}-\d{2}).*?(\d)\s*(\d)\s*(\d)', text, re.DOTALL)
+    if not m: return None
+    return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
+
+def fetch_8200():
+    """8200.cn - 彩票数据API"""
+    url = "https://api.8200.cn/hall/fc3d/getFc3dLotteryList?pageNo=1&pageSize=1"
+    text = http_get(url)
+    if not text: return None
+    try:
+        data = json.loads(text)
+        if data.get("code") != 0: return None
+        item = data.get("data", {}).get("list", [{}])[0]
+        nums = item.get("openCode", "").split(",")
+        if len(nums) < 3: return None
+        return {"issue": item.get("periodNo", ""), "date": item.get("openTime", "")[:10],
+                "b": int(nums[0]), "s": int(nums[1]), "g": int(nums[2])}
+    except: return None
+
+def fetch_caijing():
+    """彩经网 - 福彩3D开奖"""
+    url = "https://www.cjcp.com.cn/kaijiang/fc3d/"
+    text = http_get(url)
+    if not text: return None
+    m = re.search(r'(\d{7})\s*期.*?(\d{4}-\d{2}-\d{2}).*?<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)\s*</span>\s*<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)\s*</span>\s*<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)', text, re.DOTALL)
+    if not m:
+        m = re.search(r'(\d{7}).*?(\d{4}-\d{2}-\d{2}).*?(\d)\D+(\d)\D+(\d)', text, re.DOTALL)
     if not m: return None
     return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
 
