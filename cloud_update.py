@@ -322,9 +322,6 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 <div class="pv">{period_correct_100}/{period_n_100} = {acc_period_100:.1f}%</div>
 <div class="pl">近{period_n_100}期综合（按「期」统计 · 三期全对才算一期正确）</div>
 </div>
-<div class="stats" style="grid-template-columns:1fr">
-<div class="stat"><div class="sv">{acc_all:.1f}%</div><div class="sl">综合准确率（按位置统计）</div></div>
-</div>
 
 <div class="info-card">
 <h3>📋 策略详情</h3>
