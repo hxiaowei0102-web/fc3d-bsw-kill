@@ -1,8 +1,9 @@
 """
 福彩3D 百十个杀码 — 云端全自动更新
 =============================================
-6数据源降级获取 → 追加CSV → V7引擎回测 → 生成HTML → GitHub Pages
+6数据源降级获取 → 追加CSV → V8引擎回测 → 生成HTML → GitHub Pages
 三重cron兜底: 北京22:00/23:30/01:00 (UTC 14:00/15:30/17:00)
+十位V8a: sum_odd b²+s²=0修复 + span_ge6 b最大修复 → 200期98.5%
 """
 import csv, json, os, re, sys, io
 from datetime import datetime, timezone, timedelta
@@ -150,7 +151,7 @@ def append_csv(path, data):
                        f"{data['b']} {data['s']} {data['g']} 0 0 0 0 0 0 0 0 0 0 0 0"])
     return 1
 
-# ── V7 三位置公式引擎 ──────────────────────────────────
+# ── V8 三位置公式引擎 ──────────────────────────────────
 def kill_h(b, s, g):
     span = max(b,s,g) - min(b,s,g)
     if b%2==0 and s%2==0 and g%2==0:  return (b+s+g+1) % 10
@@ -168,8 +169,15 @@ def kill_h(b, s, g):
 H_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
 
 def kill_t(b, s, g):
-    if (b+s+g) % 2 == 1: return (b*b + s*s + g) % 10
-    if max(b,s,g)-min(b,s,g) >= 6: return (3*max(b,s,g)) % 10
+    # V8a: sum_odd b²+s²=0修复 + span_ge6 b最大修复 → 200期98.5%
+    if (b+s+g) % 2 == 1:
+        if (b*b + s*s) % 10 == 0:
+            return (b + s + g + 2) % 10
+        return (b*b + s*s + g) % 10
+    if max(b,s,g)-min(b,s,g) >= 6:
+        if b >= s and b >= g:
+            return ((b + s) * g) % 10
+        return (3*max(b,s,g)) % 10
     return (g*g + b) % 10
 
 T_FB = [lambda b,s,g:(g*g+b)%10, lambda b,s,g:(b+s+g+1)%10,
@@ -299,7 +307,7 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 </style>
 </head>
 <body>
-<h1>福彩3D 百十个杀码预测 V7</h1>
+<h1>福彩3D 百十个杀码预测 V8</h1>
 
 <div class="pred">
 <div class="badge">🔮 下一期预测</div>
@@ -379,7 +387,7 @@ def generate_html(bt):
 
 # ── MAIN ──────────────────────────────────────────────
 if __name__ == "__main__":
-    print("福彩3D 百十个杀码 · 云端更新 V7")
+    print("福彩3D 百十个杀码 · 云端更新 V8")
 
     # Step 1: 获取最新数据
     print("📡 获取最新开奖...")
