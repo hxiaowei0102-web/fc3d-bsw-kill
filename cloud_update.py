@@ -184,21 +184,53 @@ T_FB = [lambda b,s,g:(g*g+b)%10, lambda b,s,g:(b+s+g+1)%10,
         lambda b,s,g:max(b,s,g)-min(b,s,g), lambda b,s,g:(b*g)%10,
         lambda b,s,g:(b+s)%10, lambda b,s,g:(b*s)%10]
 
-def kill_o(b, s, g):
+def _get_o_cond(b, s, g):
+    sp = max(b,s,g) - min(b,s,g)
+    if b%2==1 and s%2==1 and g%2==1: return 'all_odd'
+    if b == s: return 'b_eq_s'
+    if b == g: return 'b_eq_g'
+    if s == g: return 's_eq_g'
+    if sp == 4: return 'span4'
+    if sp == 2: return 'span2'
+    if g == max(b,s,g): return 'g_max'
+    if b > g: return 'b_gt_g'
+    if b==s or s==g or b==g: return 'pair'
+    if b+s+g >= 15: return 'sum_hi'
+    if (b+s+g) % 2 == 0: return 'sum_even'
+    if (b+s+g) % 2 == 1: return 'sum_odd'
+    return 'default'
+
+O_BACKUP_FM = {
+    'g_max': lambda b,s,g: (3*max(b,s,g)) % 10,
+    'b_gt_g': lambda b,s,g: (b*b + g) % 10,
+    'sum_hi': lambda b,s,g: (b+s+g+3) % 10,
+    'sum_odd': lambda b,s,g: (b+s+g+1) % 10,
+    'default': lambda b,s,g: (b+s+g+1) % 10,
+}
+
+O_FAIL_WIN = 5
+
+def kill_o(b, s, g, fail_state=None, period_idx=None):
     span = max(b,s,g) - min(b,s,g)
-    if b%2==1 and s%2==1 and g%2==1:  return (b+s+g+3) % 10
-    if b == s:                         return (b+s+g+6) % 10
-    if b == g:                         return (b+s+g+2) % 10
-    if s == g:                         return (b+s+g+1) % 10
-    if span == 4:                      return (b*b + s*s + g) % 10
-    if span == 2:                      return (s*g + b) % 10
-    if g == max(b,s,g):               return (s*g + b) % 10
-    if b > g:                          return (s*g) % 10
-    if b==s or s==g or b==g:          return (b*s + g) % 10
-    if b+s+g >= 15:                   return (b*s + s*g) % 10
-    if (b+s+g) % 2 == 0:             return (s*g + b) % 10
-    if (b+s+g) % 2 == 1:             return (g*g * s) % 10
-    return (s*g - b) % 10
+    if b%2==1 and s%2==1 and g%2==1:  pk = (b+s+g+3) % 10
+    elif b == s:                         pk = (b+s+g+6) % 10
+    elif b == g:                         pk = (b+s+g+2) % 10
+    elif s == g:                         pk = (b+s+g+1) % 10
+    elif span == 4:                      pk = (b*b + s*s + g) % 10
+    elif span == 2:                      pk = (s*g + b) % 10
+    elif g == max(b,s,g):               pk = (s*g + b) % 10
+    elif b > g:                          pk = (s*g) % 10
+    elif b==s or s==g or b==g:          pk = (b*s + g) % 10
+    elif b+s+g >= 15:                   pk = (b*s + s*g) % 10
+    elif (b+s+g) % 2 == 0:             pk = (s*g + b) % 10
+    elif (b+s+g) % 2 == 1:             pk = (g*g * s) % 10
+    else:                                pk = (s*g - b) % 10
+    if fail_state is not None and period_idx is not None:
+        cn = _get_o_cond(b, s, g)
+        if cn in fail_state and period_idx - fail_state[cn] <= O_FAIL_WIN:
+            if cn in O_BACKUP_FM:
+                pk = O_BACKUP_FM[cn](b, s, g) % 10
+    return pk
 
 O_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
 
@@ -219,12 +251,17 @@ def compute_backtest(data):
     phk = ptk = pok = None
     cor = {"h":0,"t":0,"o":0}
     results = []
+    o_fail = {}
 
     for i in range(1, total):
         p = data[i-1]; b,s,g = p["b"],p["s"],p["g"]
         phk = apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g) if phk is not None else kill_h(b,s,g)
         ptk = apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g) if ptk is not None else kill_t(b,s,g)
-        pok = apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g) if pok is not None else kill_o(b,s,g)
+        pok_raw = kill_o(b,s,g, o_fail, i)
+        pok = apply_fb(pok_raw, pok, O_FB, b,s,g) if pok is not None else pok_raw
+        if pok == data[i]["g"]:
+            cn = _get_o_cond(b, s, g)
+            o_fail[cn] = i
 
         if i >= start:
             cr = data[i]
@@ -244,7 +281,7 @@ def compute_backtest(data):
     next_kill = {
         "h": apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g),
         "t": apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g),
-        "o": apply_fb(kill_o(b,s,g), pok, O_FB, b,s,g),
+        "o": apply_fb(kill_o(b,s,g, o_fail, total), pok, O_FB, b,s,g),
     }
 
     n = len(results)
