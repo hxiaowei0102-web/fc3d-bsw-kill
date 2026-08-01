@@ -236,7 +236,8 @@ O_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
 
 # ── V9: 第二杀码 ──────────────────────────────────
 def kill_h2(b, s, g):
-    k = (b*b + s + g) % 10
+    span = max(b, s, g) - min(b, s, g)
+    k = (b - span + 9) % 10
     k1 = kill_h(b, s, g)
     if k == k1: k = (k + 1) % 10
     return k
