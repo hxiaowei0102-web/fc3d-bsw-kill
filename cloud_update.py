@@ -35,22 +35,28 @@ def http_get(url, timeout=15):
     return None
 
 def fetch_latest():
-    """6数据源依次尝试, 拿新数据就停"""
+    """多数据源依次尝试, 拿新数据就停 (2026-08审计后精简: apihz/8200/55128/彩经网/中彩网均已失效)"""
     sources = [
         ("灰鸟API", lambda: fetch_huiniao()),
-        ("apihz", lambda: fetch_apihz()),
-        ("中彩网", lambda: fetch_zhcw()),
-        ("8200", lambda: fetch_8200()),
-        ("55128", lambda: fetch_55128()),
-        ("彩经网", lambda: fetch_caijing()),
+        ("中彩网", lambda: fetch_zhcw()),       # 备份(页面常为缓存, 期号校验拦截)
     ]
+
+    last_issue = None
+    try:
+        rows = load_csv(CSV_PATH)
+        if rows: last_issue = rows[-1]["issue"]
+    except: pass
 
     for name, fn in sources:
         try:
             data = fn()
-            if data:
-                print(f"  ✅ {name}: {data['issue']} ({data['date']}) {data['b']}{data['s']}{data['g']}")
-                return data
+            if not data: continue
+            # 期号合理性校验: 必须 > 本地最新期号, 否则视为缓存/旧数据拒绝
+            if last_issue and str(data["issue"]) <= str(last_issue):
+                print(f"  ⏭️ {name}: 期号{data['issue']}<=本地{last_issue}, 跳过(缓存/旧数据)")
+                continue
+            print(f"  ✅ {name}: {data['issue']} ({data['date']}) {data['b']}{data['s']}{data['g']}")
+            return data
         except Exception as e:
             print(f"  ⚠️ {name}: {e}")
     return None
@@ -62,30 +68,10 @@ def fetch_huiniao():
     data = json.loads(text)
     if data.get("code") != 1: return None
     item = data["data"]["data"]["list"][0]
-    return {"issue": item["code"], "date": item["day"], "b": item["one"], "s": item["two"], "g": item["three"]}
+    return {"issue": item["code"], "date": item["day"], "b": item["one"], "s": item["two"], "g": item["three"],
+            "next_issue": item.get("next_code")}
 
-def fetch_apihz():
-    url = "https://api.apihz.cn/api/kaijiang/fc3d/list.php?key=5d6f8a9b2c1e4f7a3b8d9c0e1f2a3b4c&num=1"
-    text = http_get(url)
-    if not text: return None
-    data = json.loads(text)
-    if not data.get("data", {}).get("data"): return None
-    item = data["data"]["data"][0]
-    nums = item.get("result", "").split(" ")
-    if len(nums) < 3: return None
-    return {"issue": item["code"], "date": item["day"], "b": int(nums[0]), "s": int(nums[1]), "g": int(nums[2])}
-
-def fetch_55128():
-    url = "https://www.55128.cn/kjh/fcsd-history-61.htm"
-    text = http_get(url)
-    if not text: return None
-    m = re.search(r'<tr[^>]*>\s*<td[^>]*>(\d{7})</td>\s*<td[^>]*>([^<]+)</td>\s*<td[^>]*>\s*(?:<span[^>]*>)\s*(\d)\s*(?:</span>)\s*(?:<span[^>]*>)\s*(\d)\s*(?:</span>)\s*(?:<span[^>]*>)\s*(\d)', text)
-    if not m:
-        m = re.search(r'(\d{7}).*?(\d{4}-\d{2}-\d{2}).*?(\d)\s+(\d)\s+(\d)', text, re.DOTALL)
-    if not m: return None
-    return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
-
-# ── 新增数据源 ────────────────────────────────────────
+# ── 备份数据源 ────────────────────────────────────────
 def fetch_zhcw():
     """中彩网 - 官方福彩数据"""
     url = "https://www.zhcw.com/kjxx/fc3d/"
@@ -94,32 +80,6 @@ def fetch_zhcw():
     m = re.search(r'<em>(\d{7})</em>.*?<em>(\d{4}-\d{2}-\d{2})</em>.*?<i>(\d)</i>\s*<i>(\d)</i>\s*<i>(\d)</i>', text, re.DOTALL)
     if not m:
         m = re.search(r'(\d{7})期.*?(\d{4}-\d{2}-\d{2}).*?(\d)\s*(\d)\s*(\d)', text, re.DOTALL)
-    if not m: return None
-    return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
-
-def fetch_8200():
-    """8200.cn - 彩票数据API"""
-    url = "https://api.8200.cn/hall/fc3d/getFc3dLotteryList?pageNo=1&pageSize=1"
-    text = http_get(url)
-    if not text: return None
-    try:
-        data = json.loads(text)
-        if data.get("code") != 0: return None
-        item = data.get("data", {}).get("list", [{}])[0]
-        nums = item.get("openCode", "").split(",")
-        if len(nums) < 3: return None
-        return {"issue": item.get("periodNo", ""), "date": item.get("openTime", "")[:10],
-                "b": int(nums[0]), "s": int(nums[1]), "g": int(nums[2])}
-    except: return None
-
-def fetch_caijing():
-    """彩经网 - 福彩3D开奖"""
-    url = "https://www.cjcp.com.cn/kaijiang/fc3d/"
-    text = http_get(url)
-    if not text: return None
-    m = re.search(r'(\d{7})\s*期.*?(\d{4}-\d{2}-\d{2}).*?<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)\s*</span>\s*<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)\s*</span>\s*<span[^>]*?class="[^"]*?ball[^"]*?"[^>]*?>\s*(\d)', text, re.DOTALL)
-    if not m:
-        m = re.search(r'(\d{7}).*?(\d{4}-\d{2}-\d{2}).*?(\d)\D+(\d)\D+(\d)', text, re.DOTALL)
     if not m: return None
     return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
 
@@ -262,12 +222,26 @@ def apply_fb(kill, prev, fb_list, b, s, g):
         if alt != prev: return alt
     return (kill + 1) % 10
 
+def next_issue_calc(last):
+    """跨年安全: 福彩3D年末最后一期后回绕到次年001.
+    优先用数据源给的next_code(已含回绕); 兜底按日期判断(12-31开奖→次年001)."""
+    if last.get("next_issue"):
+        return str(last["next_issue"])
+    iss = str(last["issue"])
+    yy, seq = int(iss[:4]), int(iss[4:])
+    try:
+        d = datetime.strptime(last["date"], "%Y-%m-%d")
+        if d.month == 12 and d.day == 31:
+            return f"{yy+1}001"
+    except: pass
+    return f"{yy}{seq+1:03d}"
+
 # ── 回测 + HTML生成 ──────────────────────────────────
 def compute_backtest(data):
     total = len(data)
     start = max(0, total - BACKTEST_N)
     last = data[-1]
-    next_issue = str(int(last["issue"]) + 1)
+    next_issue = next_issue_calc(last)
 
     phk = ptk = pok = None
     cor = {"h":0,"t":0,"o":0}
@@ -482,11 +456,12 @@ if __name__ == "__main__":
             print(f"  ✅ 已追加第{new_data['issue']}期 ({new_data['date']}) {new_data['b']}{new_data['s']}{new_data['g']}")
         else:
             print(f"  ℹ️ 第{new_data['issue']}期已存在, 无需追加")
-    else:
-        print("  ⚠️ 未能获取新数据(6源均失败)")
 
     # Step 2: 加载数据
     data = load_csv(CSV_PATH)
+    # 透传数据源给的next_issue(跨年安全)到最新行
+    if new_data and new_data.get("next_issue") and data:
+        data[-1]["next_issue"] = new_data["next_issue"]
     if len(data) < 100:
         print(f"❌ 数据不足: {len(data)}期")
         sys.exit(1)

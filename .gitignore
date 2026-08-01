@@ -2,7 +2,19 @@
 __pycache__/
 .workbuddy/
 prediction_data.json
-build_html.py
-predict_engine.py
+backtest_100.json
 fetch_data.py
 *.bat
+# 实验/搜索/审计脚本不入库(避免回溯风险), 但核心引擎必须入库:
+#   cloud_update.py(云端) / predict_engine.py(本地引擎) / build_html.py(HTML生成)
+search_*.py
+verify_*.py
+validate_*.py
+optimize_*.py
+diagnose_*.py
+audit*.py
+param_search.py
+tens_enhanced.py
+test_kill2.py
+check_max_cons.py
+export_100.py

@@ -1,0 +1,30 @@
+福彩3D 百十个杀码系统 — 数据更新服务商
+
+6层降级获取，按优先级排列：
+
+1. 灰鸟API
+   类型: JSON API
+   地址: http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd
+
+2. apihz
+   类型: JSON API (带key鉴权)
+   地址: https://api.apihz.cn/api/kaijiang/fc3d/list.php
+
+3. 中彩网
+   类型: 网页解析（福彩官方）
+   地址: https://www.zhcw.com/kjxx/fc3d/
+
+4. 8200
+   类型: JSON API
+   地址: https://api.8200.cn/hall/fc3d/getFc3dLotteryList
+
+5. 55128
+   类型: 网页解析
+   地址: https://www.55128.cn/kjh/fcsd-history-61.htm
+
+6. 彩经网
+   类型: 网页解析
+   地址: https://www.cjcp.com.cn/kaijiang/fc3d/
+
+策略：依次尝试，哪个先返回数据就用哪个，后续不再调用。
+云端cron每3小时（北京22:00/23:30/01:00）自动拉取一次。

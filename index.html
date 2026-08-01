@@ -2,249 +2,193 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>福彩3D 百十个杀码预测 V9</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>福彩3D 百十个杀码预测</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fa; color: #2c3e50; min-height:100vh; }
-.container { max-width: 1200px; margin:0 auto; padding:20px; }
-.header { text-align:center; padding:30px 0 20px; }
-.header h1 { font-size:28px; font-weight:700; color:#1a237e; letter-spacing:1px; }
-.header h1 span { display:inline-block; margin:0 4px; }
-.header .subtitle { font-size:13px; color:#78909c; margin-top:6px; }
-.pred-card { background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%); border-radius:16px; padding:30px; color:white; margin-bottom:24px; box-shadow: 0 8px 32px rgba(26,35,126,.25); position:relative; overflow:hidden; }
-.pred-card::before { content:''; position:absolute; top:-50%; right:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,255,255,.06) 0%, transparent 70%); animation: shimmer 3s infinite; }
-@keyframes shimmer { 0%,100% { transform:translate(0,0); } 50% { transform:translate(10px,10px); } }
-.pred-card .badge { display:inline-block; background:rgba(255,255,255,.18); border-radius:20px; padding:5px 16px; font-size:12px; margin-bottom:20px; letter-spacing:1px; position:relative; z-index:1; }
-.pred-card .issue { font-size:16px; font-weight:600; opacity:.9; margin-bottom:24px; position:relative; z-index:1; }
-.pred-card .positions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
-.pred-card .pos { background:rgba(255,255,255,.12); backdrop-filter:blur(4px); border-radius:12px; padding:20px 28px; text-align:center; min-width:140px; border:1px solid rgba(255,255,255,.15); transition:transform .2s; }
-.pred-card .pos:hover { transform:translateY(-3px); }
-.pred-card .pos-label { font-size:13px; opacity:.75; margin-bottom:8px; }
-.pred-card .pos-num { font-size:48px; font-weight:800; line-height:1; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
-.pred-card .pos-sub { font-size:11px; opacity:.6; margin-top:6px; }
-.section-title { font-size:18px; font-weight:700; color:#1a237e; margin:28px 0 16px; padding-bottom:8px; border-bottom:2px solid #e8eaf6; display:flex; align-items:center; gap:8px; }
-.section-title .dot { width:8px; height:8px; border-radius:50%; background:#3949ab; }
-.stats-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
-.stat-card { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); text-align:center; border-top:3px solid transparent; }
-.stat-card.h { border-top-color:#4caf50; }
-.stat-card.t { border-top-color:#2196f3; }
-.stat-card.o { border-top-color:#ff9800; }
-.stat-card.a6 { border-top-color:#e94560; }
-.stat-card .stat-label { font-size:13px; color:#78909c; margin-bottom:8px; }
-.stat-card .stat-val { font-size:32px; font-weight:800; }
-.stat-card .stat-detail { font-size:12px; color:#90a4ae; margin-top:4px; }
-.stat-card.h .stat-val { color:#2e7d32; }
-.stat-card.t .stat-val { color:#1565c0; }
-.stat-card.o .stat-val { color:#e65100; }
-.stat-card.a6 .stat-val { color:#e94560; }
-.table-wrap { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; margin-bottom:24px; }
-.table-scroll { max-height:600px; overflow-y:auto; }
-table { width:100%; border-collapse:collapse; font-size:12px; }
-thead { position:sticky; top:0; z-index:2; }
-th { background:#1a237e; color:white; padding:10px 6px; font-weight:600; font-size:11px; text-align:center; white-space:nowrap; }
-td { padding:6px; text-align:center; border-bottom:1px solid #f0f0f0; }
-tr:hover td { background:#f5f7ff; }
-tr.row-fail { background:#fff3f0; }
-tr.row-fail:hover td { background:#ffe8e0; }
-.cell-ok { color:#2e7d32; font-weight:600; }
-.cell-fail { color:#c62828; font-weight:700; }
-.cell-kill { font-weight:600; }
-.cell-actual { font-weight:500; }
-.summary-row td { background:#fafafa; font-size:12px; color:#78909c; border-top:2px solid #e0e0e0; }
-.info-card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:24px; line-height:1.8; }
-.info-card h3 { color:#1a237e; font-size:15px; margin-bottom:8px; }
-.info-card p { font-size:13px; color:#546e7a; margin-bottom:6px; }
-.info-card code { background:#e8eaf6; padding:2px 6px; border-radius:4px; font-size:12px; color:#3949ab; }
-.info-card .warn { background:#fff3e0; border-left:3px solid #ff9800; padding:10px 14px; border-radius:0 8px 8px 0; margin-top:12px; font-size:12px; color:#e65100; }
-.legend { display:flex; gap:16px; margin-bottom:12px; font-size:12px; color:#78909c; }
-.legend-item { display:flex; align-items:center; gap:4px; }
-.legend-dot { width:10px; height:10px; border-radius:3px; }
-.legend-dot.ok { background:#c8e6c9; border:1px solid #66bb6a; }
-.legend-dot.fail { background:#ffcdd2; border:1px solid #ef5350; }
-.disclaimer { text-align:center; padding:20px; font-size:11px; color:#b0bec5; border-top:1px solid #eceff1; margin-top:20px; }
-@media (max-width: 768px) {
-  .pred-card .positions { flex-direction:column; align-items:center; }
-  .stats-row { grid-template-columns:1fr; }
-  .pred-card .pos-num { font-size:36px; }
-}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fa;color:#333;padding:12px;max-width:600px;margin:0 auto}
+h1{font-size:18px;text-align:center;color:#1a237e;margin:8px 0 12px}
+.pred{background:linear-gradient(135deg,#1a237e,#283593);border-radius:14px;padding:16px;color:#fff;margin-bottom:14px}
+.pred .badge{font-size:11px;opacity:.8;margin-bottom:4px}
+.pred .issue{font-size:13px;margin-bottom:12px}
+.poses{display:flex;gap:10px}
+.pos{flex:1;text-align:center;background:rgba(255,255,255,.12);border-radius:10px;padding:12px 6px}
+.pos-label{font-size:11px;opacity:.8;margin-bottom:4px}
+.pos-num{font-size:32px;font-weight:800;line-height:1}
+.section-title{font-size:14px;font-weight:700;color:#455a64;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.section-title .dot{width:8px;height:8px;border-radius:50%;background:#1a237e;display:inline-block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat .sv{font-size:24px;font-weight:800;color:#1a237e}
+.stat .sl{font-size:11px;color:#78909c;margin-top:2px}
+.stat .se{font-size:10px;color:#90a4ae}
+.period-stat{background:#fff;border-radius:10px;padding:12px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:14px}
+.period-stat .pv{font-size:22px;font-weight:800;color:#e65100}
+.period-stat .pl{font-size:11px;color:#78909c}
+.info-card{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:12px;line-height:1.7}
+.info-card h3{font-size:13px;color:#37474f;margin-bottom:6px}
+.warn{background:#fff3e0;border-left:3px solid #ff9800;padding:10px 12px;border-radius:0 8px 8px 0;font-size:11px;margin-top:8px;color:#e65100}
+table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th{background:#eceff1;padding:8px 6px;text-align:center;font-weight:600;color:#455a64;position:sticky;top:0}
+td{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}
+.ok{color:#2e7d32;font-weight:700}
+.bad{color:#c62828;font-weight:700}
+.table-wrap{max-height:60vh;overflow-y:auto;-webkit-overflow-scrolling:touch;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.disclaimer{text-align:center;font-size:10px;color:#90a4ae;margin-top:16px;padding:8px}
+@media(max-width:380px){.pos-num{font-size:26px}.stats{grid-template-columns:repeat(3,1fr);gap:6px}.stat{padding:8px 4px}.stat .sv{font-size:20px}}
 </style>
 </head>
 <body>
+<h1>福彩3D 百十个杀码预测 V9</h1>
 
-<div class="container">
-
-<!-- Header -->
-<div class="header">
-  <h1><span>福彩3D</span><span>百位·十位·个位</span><span>杀码预测 V9</span></h1>
-  <div class="subtitle">数据截至 2026-07-31（第2026202期） · 6杀制 · 算法不含未来信息</div>
+<div class="pred">
+<div class="badge">🔮 下一期预测（6杀制）</div>
+<div class="issue">第 <strong>2026203</strong> 期</div>
+<div class="poses">
+<div class="pos"><div class="pos-label">百位杀码</div><div class="pos-num">3,7</div></div>
+<div class="pos"><div class="pos-label">十位杀码</div><div class="pos-num">3,5</div></div>
+<div class="pos"><div class="pos-label">个位杀码</div><div class="pos-num">6,5</div></div>
+</div>
 </div>
 
-<!-- Prediction Card -->
-<div class="pred-card" id="predCard">
-  <div class="badge">🔮 今日预测（6杀制）</div>
-  <div class="issue">第 <strong id="predIssue">2026203</strong> 期 · 2026-08-01 <small style="opacity:.6">（基于截止第2026202期数据）</small></div>
-  <div class="positions">
-    <div class="pos">
-      <div class="pos-label">百位杀码</div>
-      <div class="pos-num" id="predH">3,7</div>
-      <div class="pos-sub">kill1 + kill2</div>
-    </div>
-    <div class="pos">
-      <div class="pos-label">十位杀码</div>
-      <div class="pos-num" id="predT">3,5</div>
-      <div class="pos-sub">kill1 + kill2</div>
-    </div>
-    <div class="pos">
-      <div class="pos-label">个位杀码</div>
-      <div class="pos-num" id="predO">6,5</div>
-      <div class="pos-sub">kill1 + kill2</div>
-    </div>
-  </div>
+<div class="section-title"><span class="dot"></span>近100期回测（3杀+6杀）</div>
+<div class="stats">
+<div class="stat"><div class="sv">98.0%</div><div class="sl">百位</div><div class="se">错2期</div></div>
+<div class="stat"><div class="sv">98.0%</div><div class="sl">十位</div><div class="se">错2期</div></div>
+<div class="stat"><div class="sv">97.0%</div><div class="sl">个位</div><div class="se">错3期</div></div>
 </div>
 
-<!-- Stats: 100期 3杀 + 6杀 -->
-<div class="section-title"><span class="dot"></span>近100期回测（3杀 + 6杀）</div>
-<div class="stats-row">
-  <div class="stat-card h">
-    <div class="stat-label">百位 kill1</div>
-    <div class="stat-val">98.0%</div>
-    <div class="stat-detail">98正确 / 2错误</div>
-  </div>
-  <div class="stat-card t">
-    <div class="stat-label">十位 kill1</div>
-    <div class="stat-val">98.0%</div>
-    <div class="stat-detail">98正确 / 2错误</div>
-  </div>
-  <div class="stat-card o">
-    <div class="stat-label">个位 kill1</div>
-    <div class="stat-val">97.0%</div>
-    <div class="stat-detail">97正确 / 3错误</div>
-  </div>
-  <div class="stat-card a6">
-    <div class="stat-label">6杀全中率</div>
-    <div class="stat-val">87%</div>
-    <div class="stat-detail">87/100期</div>
-  </div>
+<div class="stats" style="grid-template-columns:repeat(4,1fr)">
+<div class="stat"><div class="sv" style="font-size:20px;color:#0f3460">98.0%</div><div class="sl">百kill2</div></div>
+<div class="stat"><div class="sv" style="font-size:20px;color:#533483">99.0%</div><div class="sl">十kill2</div></div>
+<div class="stat"><div class="sv" style="font-size:20px;color:#16a085">96.0%</div><div class="sl">个kill2</div></div>
+<div class="stat" style="border-top:3px solid #e94560"><div class="sv" style="font-size:20px;color:#e94560">87.0%</div><div class="sl">6杀全中</div></div>
 </div>
 
-<!-- kill2 stats -->
-<div class="section-title"><span class="dot"></span>kill2 独立准确率（近100期）</div>
-<div class="stats-row">
-  <div class="stat-card" style="border-top-color:#0f3460">
-    <div class="stat-label">百位 kill2</div>
-    <div class="stat-val" style="color:#0f3460">98.0%</div>
-    <div class="stat-detail">98正确 / 2错误</div>
-  </div>
-  <div class="stat-card" style="border-top-color:#533483">
-    <div class="stat-label">十位 kill2</div>
-    <div class="stat-val" style="color:#533483">99.0%</div>
-    <div class="stat-detail">99正确 / 1错误</div>
-  </div>
-  <div class="stat-card" style="border-top-color:#16a085">
-    <div class="stat-label">个位 kill2</div>
-    <div class="stat-val" style="color:#16a085">96.0%</div>
-    <div class="stat-detail">96正确 / 4错误</div>
-  </div>
+<div class="info-card">
+<h3>📋 V9 六杀引擎</h3>
+<p><strong>每位置双杀码：</strong>kill1（V8条件决策树）+ kill2（独立算术公式）<br>
+<strong>kill2公式：</strong>百=(b²+s+g)%10 · 十=(b*s)%10 · 个=(b+s+g+7)%10<br>
+<strong>重叠处理：</strong>kill2==kill1时自动+1偏移<br>
+<strong>6杀全中：</strong>近100期 <strong>87.0%</strong> · 全量≈53%（基线51.2%）</p>
+<div class="warn">
+⚠️ <strong>重要提示：</strong>彩票本质是随机游戏。近100期3杀综合<strong>97.7%</strong>，6杀全中<strong>87.0%</strong>。6杀全中理论上限≈66%，当前已显著超越随机基线51.2%。请理性参考。
+</div>
 </div>
 
-<!-- Backtest Table: 100期 6杀明细 -->
-<div class="section-title"><span class="dot"></span>近100期回测明细（6杀码 · 近期→远期）</div>
-<div class="legend">
-  <div class="legend-item"><span class="legend-dot ok"></span> 6杀全对</div>
-  <div class="legend-item"><span class="legend-dot fail"></span> 有杀码错误</div>
-</div>
+<div class="section-title"><span class="dot"></span>近100期回测明细（6杀码）</div>
 <div class="table-wrap">
-  <div class="table-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>期号</th><th>日期</th><th>开奖号</th>
-          <th>百位杀</th><th>百位结果</th>
-          <th>十位杀</th><th>十位结果</th>
-          <th>个位杀</th><th>个位结果</th>
-          <th>6杀</th>
-        </tr>
-      </thead>
-      <tbody id="backtestBody"></tbody>
-    </table>
-  </div>
-</div>
+<table>
+<thead><tr><th>期号</th><th>日期</th><th>开奖</th><th>百杀</th><th>十杀</th><th>个杀</th><th>6杀</th></tr></thead>
+<tbody>
+<tr><td>2026202</td><td>2026-07-31</td><td>988</td><td><span class="ok">✅5,0</span></td><td><span class="ok">✅4,5</span></td><td><span class="ok">✅5,3</span></td><td>✅</td></tr>
+<tr><td>2026201</td><td>2026-07-30</td><td>321</td><td><span class="bad">❌3,0</span></td><td><span class="ok">✅0,4</span></td><td><span class="bad">❌2,1</span></td><td>❌</td></tr>
+<tr><td>2026200</td><td>2026-07-29</td><td>912</td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅8,5</span></td><td>✅</td></tr>
+<tr><td>2026199</td><td>2026-07-28</td><td>591</td><td><span class="ok">✅9,2</span></td><td><span class="ok">✅1,7</span></td><td><span class="ok">✅0,6</span></td><td>✅</td></tr>
+<tr><td>2026198</td><td>2026-07-27</td><td>685</td><td><span class="ok">✅2,0</span></td><td><span class="ok">✅6,6</span></td><td><span class="ok">✅9,4</span></td><td>✅</td></tr>
+<tr><td>2026197</td><td>2026-07-26</td><td>232</td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅5,2</span></td><td><span class="ok">✅5,6</span></td><td>✅</td></tr>
+<tr><td>2026196</td><td>2026-07-25</td><td>419</td><td><span class="ok">✅6,7</span></td><td><span class="ok">✅7,8</span></td><td><span class="ok">✅7,8</span></td><td>✅</td></tr>
+<tr><td>2026195</td><td>2026-07-24</td><td>275</td><td><span class="ok">✅8,5</span></td><td><span class="ok">✅1,0</span></td><td><span class="ok">✅2,0</span></td><td>✅</td></tr>
+<tr><td>2026194</td><td>2026-07-23</td><td>283</td><td><span class="ok">✅5,8</span></td><td><span class="bad">❌8,6</span></td><td><span class="ok">✅0,8</span></td><td>❌</td></tr>
+<tr><td>2026193</td><td>2026-07-22</td><td>254</td><td><span class="ok">✅3,0</span></td><td><span class="ok">✅3,4</span></td><td><span class="bad">❌4,6</span></td><td>❌</td></tr>
+<tr><td>2026192</td><td>2026-07-21</td><td>425</td><td><span class="bad">❌4,9</span></td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅0,9</span></td><td>❌</td></tr>
+<tr><td>2026191</td><td>2026-07-20</td><td>906</td><td><span class="ok">✅0,3</span></td><td><span class="ok">✅8,5</span></td><td><span class="ok">✅2,3</span></td><td>✅</td></tr>
+<tr><td>2026190</td><td>2026-07-19</td><td>026</td><td><span class="ok">✅9,1</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅4,7</span></td><td>✅</td></tr>
+<tr><td>2026189</td><td>2026-07-18</td><td>558</td><td><span class="bad">❌4,5</span></td><td><span class="ok">✅0,2</span></td><td><span class="ok">✅5,1</span></td><td>❌</td></tr>
+<tr><td>2026188</td><td>2026-07-17</td><td>969</td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅6,2</span></td><td>✅</td></tr>
+<tr><td>2026187</td><td>2026-07-16</td><td>023</td><td><span class="ok">✅9,4</span></td><td><span class="ok">✅5,5</span></td><td><span class="ok">✅0,1</span></td><td>✅</td></tr>
+<tr><td>2026186</td><td>2026-07-15</td><td>045</td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅1,7</span></td><td><span class="ok">✅2,3</span></td><td>✅</td></tr>
+<tr><td>2026185</td><td>2026-07-14</td><td>397</td><td><span class="ok">✅2,9</span></td><td><span class="ok">✅2,4</span></td><td><span class="ok">✅0,1</span></td><td>✅</td></tr>
+<tr><td>2026184</td><td>2026-07-13</td><td>902</td><td><span class="ok">✅8,1</span></td><td><span class="ok">✅3,4</span></td><td><span class="ok">✅6,5</span></td><td>✅</td></tr>
+<tr><td>2026183</td><td>2026-07-12</td><td>923</td><td><span class="ok">✅5,1</span></td><td><span class="ok">✅0,5</span></td><td><span class="ok">✅0,8</span></td><td>✅</td></tr>
+<tr><td>2026182</td><td>2026-07-11</td><td>662</td><td><span class="ok">✅8,0</span></td><td><span class="ok">✅3,8</span></td><td><span class="ok">✅9,4</span></td><td>✅</td></tr>
+<tr><td>2026181</td><td>2026-07-10</td><td>818</td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅0,5</span></td><td>✅</td></tr>
+<tr><td>2026180</td><td>2026-07-09</td><td>520</td><td><span class="ok">✅3,2</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅4,5</span></td><td>✅</td></tr>
+<tr><td>2026179</td><td>2026-07-08</td><td>993</td><td><span class="ok">✅5,7</span></td><td><span class="ok">✅8,5</span></td><td><span class="ok">✅5,0</span></td><td>✅</td></tr>
+<tr><td>2026178</td><td>2026-07-07</td><td>266</td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅4,7</span></td><td><span class="ok">✅8,4</span></td><td>✅</td></tr>
+<tr><td>2026177</td><td>2026-07-06</td><td>808</td><td><span class="ok">✅2,4</span></td><td><span class="ok">✅3,5</span></td><td><span class="bad">❌6,8</span></td><td>❌</td></tr>
+<tr><td>2026176</td><td>2026-07-05</td><td>269</td><td><span class="ok">✅9,0</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅2,4</span></td><td>✅</td></tr>
+<tr><td>2026175</td><td>2026-07-04</td><td>421</td><td><span class="ok">✅7,8</span></td><td><span class="ok">✅0,0</span></td><td><span class="ok">✅4,6</span></td><td>✅</td></tr>
+<tr><td>2026174</td><td>2026-07-03</td><td>618</td><td><span class="ok">✅8,4</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅1,0</span></td><td>✅</td></tr>
+<tr><td>2026173</td><td>2026-07-02</td><td>677</td><td><span class="ok">✅5,2</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅9,6</span></td><td>✅</td></tr>
+<tr><td>2026172</td><td>2026-07-01</td><td>445</td><td><span class="ok">✅9,7</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅3,9</span></td><td>✅</td></tr>
+<tr><td>2026171</td><td>2026-06-30</td><td>134</td><td><span class="ok">✅0,9</span></td><td><span class="ok">✅9,0</span></td><td><span class="ok">✅0,8</span></td><td>✅</td></tr>
+<tr><td>2026170</td><td>2026-06-29</td><td>805</td><td><span class="ok">✅3,1</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅6,0</span></td><td>✅</td></tr>
+<tr><td>2026169</td><td>2026-06-28</td><td>832</td><td><span class="ok">✅6,7</span></td><td><span class="ok">✅1,7</span></td><td><span class="ok">✅0,1</span></td><td>✅</td></tr>
+<tr><td>2026168</td><td>2026-06-27</td><td>130</td><td><span class="ok">✅8,0</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅3,6</span></td><td>✅</td></tr>
+<tr><td>2026167</td><td>2026-06-26</td><td>631</td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅0,9</span></td><td>✅</td></tr>
+<tr><td>2026166</td><td>2026-06-25</td><td>900</td><td><span class="ok">✅8,2</span></td><td><span class="bad">❌0,3</span></td><td><span class="ok">✅2,6</span></td><td>❌</td></tr>
+<tr><td>2026165</td><td>2026-06-24</td><td>424</td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅7,8</span></td><td><span class="ok">✅0,6</span></td><td>✅</td></tr>
+<tr><td>2026164</td><td>2026-06-23</td><td>690</td><td><span class="ok">✅7,0</span></td><td><span class="ok">✅1,3</span></td><td><span class="ok">✅8,1</span></td><td>✅</td></tr>
+<tr><td>2026163</td><td>2026-06-22</td><td>537</td><td><span class="ok">✅4,1</span></td><td><span class="ok">✅0,8</span></td><td><span class="ok">✅0,5</span></td><td>✅</td></tr>
+<tr><td>2026162</td><td>2026-06-21</td><td>585</td><td><span class="ok">✅3,7</span></td><td><span class="ok">✅7,2</span></td><td><span class="bad">❌3,5</span></td><td>❌</td></tr>
+<tr><td>2026161</td><td>2026-06-20</td><td>529</td><td><span class="ok">✅9,1</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅4,5</span></td><td>✅</td></tr>
+<tr><td>2026160</td><td>2026-06-19</td><td>332</td><td><span class="ok">✅5,4</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅6,9</span></td><td>✅</td></tr>
+<tr><td>2026159</td><td>2026-06-18</td><td>995</td><td><span class="ok">✅1,3</span></td><td><span class="ok">✅4,5</span></td><td><span class="ok">✅8,1</span></td><td>✅</td></tr>
+<tr><td>2026158</td><td>2026-06-17</td><td>178</td><td><span class="ok">✅4,7</span></td><td><span class="ok">✅2,4</span></td><td><span class="ok">✅7,3</span></td><td>✅</td></tr>
+<tr><td>2026157</td><td>2026-06-16</td><td>327</td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅9,0</span></td><td><span class="ok">✅0,5</span></td><td>✅</td></tr>
+<tr><td>2026156</td><td>2026-06-15</td><td>162</td><td><span class="ok">✅6,4</span></td><td><span class="ok">✅5,1</span></td><td><span class="ok">✅4,6</span></td><td>✅</td></tr>
+<tr><td>2026155</td><td>2026-06-14</td><td>409</td><td><span class="ok">✅9,8</span></td><td><span class="ok">✅2,6</span></td><td><span class="ok">✅0,3</span></td><td>✅</td></tr>
+<tr><td>2026154</td><td>2026-06-13</td><td>377</td><td><span class="ok">✅4,6</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅9,0</span></td><td>✅</td></tr>
+<tr><td>2026153</td><td>2026-06-12</td><td>887</td><td><span class="ok">✅5,9</span></td><td><span class="ok">✅2,5</span></td><td><span class="ok">✅0,2</span></td><td>✅</td></tr>
+<tr><td>2026152</td><td>2026-06-11</td><td>220</td><td><span class="ok">✅1,0</span></td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅3,6</span></td><td>✅</td></tr>
+<tr><td>2026151</td><td>2026-06-10</td><td>631</td><td><span class="ok">✅8,9</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅0,7</span></td><td>✅</td></tr>
+<tr><td>2026150</td><td>2026-06-09</td><td>720</td><td><span class="ok">✅4,2</span></td><td><span class="ok">✅3,8</span></td><td><span class="ok">✅3,6</span></td><td>✅</td></tr>
+<tr><td>2026149</td><td>2026-06-08</td><td>696</td><td><span class="ok">✅0,5</span></td><td><span class="ok">✅4,1</span></td><td><span class="ok">✅4,8</span></td><td>✅</td></tr>
+<tr><td>2026148</td><td>2026-06-07</td><td>408</td><td><span class="ok">✅3,0</span></td><td><span class="ok">✅6,4</span></td><td><span class="ok">✅1,9</span></td><td>✅</td></tr>
+<tr><td>2026147</td><td>2026-06-06</td><td>712</td><td><span class="ok">✅5,1</span></td><td><span class="ok">✅0,7</span></td><td><span class="ok">✅6,7</span></td><td>✅</td></tr>
+<tr><td>2026146</td><td>2026-06-05</td><td>464</td><td><span class="bad">❌1,4</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅9,8</span></td><td>❌</td></tr>
+<tr><td>2026145</td><td>2026-06-04</td><td>279</td><td><span class="ok">✅7,1</span></td><td><span class="ok">✅9,1</span></td><td><span class="ok">✅5,7</span></td><td>✅</td></tr>
+<tr><td>2026144</td><td>2026-06-03</td><td>726</td><td><span class="ok">✅8,9</span></td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅4,9</span></td><td>✅</td></tr>
+<tr><td>2026143</td><td>2026-06-02</td><td>376</td><td><span class="ok">✅9,2</span></td><td><span class="ok">✅9,6</span></td><td><span class="bad">❌6,0</span></td><td>❌</td></tr>
+<tr><td>2026142</td><td>2026-06-01</td><td>894</td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅1,7</span></td><td><span class="ok">✅2,3</span></td><td>✅</td></tr>
+<tr><td>2026141</td><td>2026-05-31</td><td>397</td><td><span class="ok">✅2,5</span></td><td><span class="ok">✅3,8</span></td><td><span class="ok">✅6,8</span></td><td>✅</td></tr>
+<tr><td>2026140</td><td>2026-05-30</td><td>285</td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅4,7</span></td><td><span class="ok">✅4,0</span></td><td>✅</td></tr>
+<tr><td>2026139</td><td>2026-05-29</td><td>286</td><td><span class="ok">✅1,7</span></td><td><span class="bad">❌7,8</span></td><td><span class="ok">✅0,7</span></td><td>❌</td></tr>
+<tr><td>2026138</td><td>2026-05-28</td><td>790</td><td><span class="ok">✅4,5</span></td><td><span class="ok">✅6,7</span></td><td><span class="ok">✅3,9</span></td><td>✅</td></tr>
+<tr><td>2026137</td><td>2026-05-27</td><td>165</td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅1,2</span></td><td>✅</td></tr>
+<tr><td>2026136</td><td>2026-05-26</td><td>889</td><td><span class="ok">✅1,9</span></td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅7,2</span></td><td>✅</td></tr>
+<tr><td>2026135</td><td>2026-05-25</td><td>487</td><td><span class="ok">✅7,3</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅6,8</span></td><td>✅</td></tr>
+<tr><td>2026134</td><td>2026-05-24</td><td>654</td><td><span class="ok">✅0,1</span></td><td><span class="ok">✅4,3</span></td><td><span class="ok">✅0,1</span></td><td>✅</td></tr>
+<tr><td>2026133</td><td>2026-05-23</td><td>080</td><td><span class="ok">✅9,4</span></td><td><span class="ok">✅3,4</span></td><td><span class="ok">✅7,8</span></td><td>✅</td></tr>
+<tr><td>2026132</td><td>2026-05-22</td><td>756</td><td><span class="ok">✅4,0</span></td><td><span class="ok">✅9,6</span></td><td><span class="ok">✅3,7</span></td><td>✅</td></tr>
+<tr><td>2026131</td><td>2026-05-21</td><td>598</td><td><span class="ok">✅9,6</span></td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅4,5</span></td><td>✅</td></tr>
+<tr><td>2026130</td><td>2026-05-20</td><td>267</td><td><span class="ok">✅6,6</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅0,2</span></td><td>✅</td></tr>
+<tr><td>2026129</td><td>2026-05-19</td><td>023</td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅3,5</span></td><td><span class="ok">✅6,7</span></td><td>✅</td></tr>
+<tr><td>2026128</td><td>2026-05-18</td><td>776</td><td><span class="ok">✅5,9</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅8,7</span></td><td>✅</td></tr>
+<tr><td>2026127</td><td>2026-05-17</td><td>700</td><td><span class="ok">✅2,3</span></td><td><span class="ok">✅4,3</span></td><td><span class="ok">✅6,8</span></td><td>✅</td></tr>
+<tr><td>2026126</td><td>2026-05-16</td><td>846</td><td><span class="ok">✅9,3</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅9,1</span></td><td>✅</td></tr>
+<tr><td>2026125</td><td>2026-05-15</td><td>954</td><td><span class="ok">✅1,3</span></td><td><span class="ok">✅4,1</span></td><td><span class="ok">✅0,2</span></td><td>✅</td></tr>
+<tr><td>2026124</td><td>2026-05-14</td><td>280</td><td><span class="ok">✅3,9</span></td><td><span class="ok">✅2,5</span></td><td><span class="ok">✅3,2</span></td><td>✅</td></tr>
+<tr><td>2026123</td><td>2026-05-13</td><td>200</td><td><span class="ok">✅9,0</span></td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅7,9</span></td><td>✅</td></tr>
+<tr><td>2026122</td><td>2026-05-12</td><td>346</td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅7,1</span></td><td><span class="ok">✅8,9</span></td><td>✅</td></tr>
+<tr><td>2026121</td><td>2026-05-11</td><td>393</td><td><span class="ok">✅5,2</span></td><td><span class="ok">✅3,4</span></td><td><span class="ok">✅2,9</span></td><td>✅</td></tr>
+<tr><td>2026120</td><td>2026-05-10</td><td>734</td><td><span class="ok">✅6,9</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅0,5</span></td><td>✅</td></tr>
+<tr><td>2026119</td><td>2026-05-09</td><td>112</td><td><span class="ok">✅8,9</span></td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅3,5</span></td><td>✅</td></tr>
+<tr><td>2026118</td><td>2026-05-08</td><td>132</td><td><span class="ok">✅4,0</span></td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅7,4</span></td><td>✅</td></tr>
+<tr><td>2026117</td><td>2026-05-07</td><td>411</td><td><span class="ok">✅3,7</span></td><td><span class="ok">✅0,7</span></td><td><span class="ok">✅4,0</span></td><td>✅</td></tr>
+<tr><td>2026116</td><td>2026-05-06</td><td>020</td><td><span class="ok">✅7,8</span></td><td><span class="ok">✅6,8</span></td><td><span class="ok">✅8,5</span></td><td>✅</td></tr>
+<tr><td>2026115</td><td>2026-05-05</td><td>581</td><td><span class="ok">✅9,3</span></td><td><span class="ok">✅4,5</span></td><td><span class="ok">✅4,0</span></td><td>✅</td></tr>
+<tr><td>2026114</td><td>2026-05-04</td><td>864</td><td><span class="ok">✅5,6</span></td><td><span class="ok">✅0,9</span></td><td><span class="ok">✅6,0</span></td><td>✅</td></tr>
+<tr><td>2026113</td><td>2026-05-03</td><td>040</td><td><span class="ok">✅4,3</span></td><td><span class="ok">✅1,6</span></td><td><span class="bad">❌0,1</span></td><td>❌</td></tr>
+<tr><td>2026112</td><td>2026-05-02</td><td>065</td><td><span class="ok">✅9,2</span></td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅8,4</span></td><td>✅</td></tr>
+<tr><td>2026111</td><td>2026-05-01</td><td>863</td><td><span class="ok">✅1,6</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅2,7</span></td><td>✅</td></tr>
+<tr><td>2026110</td><td>2026-04-30</td><td>379</td><td><span class="ok">✅7,2</span></td><td><span class="ok">✅6,9</span></td><td><span class="bad">❌8,9</span></td><td>❌</td></tr>
+<tr><td>2026109</td><td>2026-04-29</td><td>195</td><td><span class="ok">✅5,0</span></td><td><span class="ok">✅7,6</span></td><td><span class="ok">✅7,6</span></td><td>✅</td></tr>
+<tr><td>2026108</td><td>2026-04-28</td><td>671</td><td><span class="ok">✅9,5</span></td><td><span class="ok">✅1,5</span></td><td><span class="ok">✅8,0</span></td><td>✅</td></tr>
+<tr><td>2026107</td><td>2026-04-27</td><td>278</td><td><span class="ok">✅0,1</span></td><td><span class="ok">✅3,9</span></td><td><span class="ok">✅6,5</span></td><td>✅</td></tr>
+<tr><td>2026106</td><td>2026-04-26</td><td>928</td><td><span class="ok">✅8,0</span></td><td><span class="ok">✅7,5</span></td><td><span class="ok">✅3,6</span></td><td>✅</td></tr>
+<tr><td>2026105</td><td>2026-04-25</td><td>631</td><td><span class="ok">✅5,7</span></td><td><span class="ok">✅4,9</span></td><td><span class="ok">✅6,7</span></td><td>✅</td></tr>
+<tr><td>2026104</td><td>2026-04-24</td><td>482</td><td><span class="ok">✅8,0</span></td><td><span class="ok">✅3,5</span></td><td><span class="ok">✅9,6</span></td><td>✅</td></tr>
+<tr><td>2026103</td><td>2026-04-23</td><td>661</td><td><span class="ok">✅7,9</span></td><td><span class="ok">✅4,5</span></td><td><span class="ok">✅0,4</span></td><td>✅</td></tr>
 
-<!-- Strategy -->
-<div class="section-title"><span class="dot"></span>策略架构（V9 六杀引擎）</div>
-<div class="info-card">
-  <h3>🔬 V9 六杀引擎</h3>
-  <p><strong>每位置双杀码：</strong>kill1（V8条件决策树）+ kill2（独立算术公式），6杀全中为命中</p>
-  <p><strong>kill2公式：</strong>百位=(b²+s+g)%10 · 十位=(b*s)%10 · 个位=(b+s+g+7)%10</p>
-  <p><strong>重叠处理：</strong>kill2==kill1时自动+1偏移，保证2个杀码不重复</p>
-</div>
-<div class="info-card">
-  <h3>📋 策略详情</h3>
-  <p><strong>百位 kill1：</strong>10条件决策树 — <strong>98.0%</strong> | kill2: (b²+s+g)%10 — <strong>98.0%</strong></p>
-  <p><strong>十位 kill1：</strong>V8a增强公式 — <strong>98.0%</strong> | kill2: (b*s)%10 — <strong>99.0%</strong></p>
-  <p><strong>个位 kill1：</strong>12条件决策树+自适应备份 — <strong>97.0%</strong> | kill2: (b+s+g+7)%10 — <strong>96.0%</strong></p>
-  <div class="warn">
-    ⚠️ <strong>重要提示：</strong>彩票本质是随机游戏。本算法基于历史统计规律，当前100期3杀综合准确率<strong>97.67%</strong>，6杀全中率<strong>87%</strong>。数学理论上杀一码极限≈90%，6杀全中理论上限≈66%。但无法保证未来准确率，请理性参考。
-  </div>
+</tbody>
+</table>
 </div>
 
 <div class="disclaimer">
-  数据来源：福彩3D历史开奖数据 | V9六杀引擎 | 严格无未来信息 | 仅供研究参考
+数据来源：福彩3D历史开奖数据 | 算法严格不含未来信息 | 仅供研究参考<br>
+数据截止 2026-07-31 · 共8710期
 </div>
-
-</div>
-
-<script>
-const DATA = {"version": "V9", "lastIssue": "2026202", "lastDate": "2026-07-31", "prediction": {"issue": "2026203", "date": "2026-08-01", "hundreds": 3, "tens": 3, "ones": 6, "hundreds2": 7, "tens2": 5, "ones2": 5}, "strategies": {"hundreds": "公式决策树", "tens": "公式决策树", "ones": "公式决策树"}, "multiWindow": {"近100期": {"百位": "98/100 = 98.0%", "十位": "98/100 = 98.0%", "个位": "97/100 = 97.0%", "综合": "97.7%", "百位kill2": "98/100 = 98.0%", "十位kill2": "99/100 = 99.0%", "个位kill2": "96/100 = 96.0%", "6杀全中": "87/100 = 87.0%", "最大连续错": 3}, "近200期": {"百位": "197/200 = 98.5%", "十位": "197/200 = 98.5%", "个位": "195/200 = 97.5%", "综合": "98.2%", "百位kill2": "191/200 = 95.5%", "十位kill2": "191/200 = 95.5%", "个位kill2": "189/200 = 94.5%", "6杀全中": "164/200 = 82.0%", "最大连续错": 3}, "近300期": {"百位": "289/300 = 96.3%", "十位": "289/300 = 96.3%", "个位": "287/300 = 95.7%", "综合": "96.1%", "百位kill2": "283/300 = 94.3%", "十位kill2": "280/300 = 93.3%", "个位kill2": "282/300 = 94.0%", "6杀全中": "223/300 = 74.3%", "最大连续错": 3}, "近500期": {"百位": "471/500 = 94.2%", "十位": "459/500 = 91.8%", "个位": "464/500 = 92.8%", "综合": "92.9%", "百位kill2": "467/500 = 93.4%", "十位kill2": "468/500 = 93.6%", "个位kill2": "470/500 = 94.0%", "6杀全中": "332/500 = 66.4%", "最大连续错": 5}, "全量": {"百位": "7889/8709 = 90.6%", "十位": "7871/8709 = 90.4%", "个位": "7860/8709 = 90.3%", "综合": "90.4%", "百位kill2": "7877/8709 = 90.4%", "十位kill2": "7861/8709 = 90.3%", "个位kill2": "7848/8709 = 90.1%", "6杀全中": "4630/8709 = 53.2%", "最大连续错": 7}}, "stats": {"h": 98.0, "t": 98.0, "o": 97.0, "overall": 97.67, "hC": 98, "hW": 2, "tC": 98, "tW": 2, "oC": 97, "oW": 3, "h2": 98.0, "t2": 99.0, "o2": 96.0, "h2C": 98, "h2W": 2, "t2C": 99, "t2W": 1, "o2C": 96, "o2W": 4, "all6": 87, "all6Pct": 87}, "daily": [{"issue": "2026202", "date": "2026-07-31", "actual": "988", "hK": 5, "tK": 4, "oK": 5, "hK2": 0, "tK2": 5, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026201", "date": "2026-07-30", "actual": "321", "hK": 3, "tK": 0, "oK": 2, "hK2": 0, "tK2": 4, "oK2": 1, "hOK": false, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": false, "allOK": false, "all6OK": false}, {"issue": "2026200", "date": "2026-07-29", "actual": "912", "hK": 7, "tK": 7, "oK": 8, "hK2": 6, "tK2": 9, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026199", "date": "2026-07-28", "actual": "591", "hK": 9, "tK": 1, "oK": 0, "hK2": 2, "tK2": 7, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026198", "date": "2026-07-27", "actual": "685", "hK": 2, "tK": 6, "oK": 9, "hK2": 0, "tK2": 6, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026197", "date": "2026-07-26", "actual": "232", "hK": 5, "tK": 5, "oK": 3, "hK2": 6, "tK2": 2, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026196", "date": "2026-07-25", "actual": "419", "hK": 6, "tK": 7, "oK": 7, "hK2": 7, "tK2": 8, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026195", "date": "2026-07-24", "actual": "275", "hK": 8, "tK": 1, "oK": 2, "hK2": 5, "tK2": 0, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026194", "date": "2026-07-23", "actual": "283", "hK": 5, "tK": 8, "oK": 0, "hK2": 8, "tK2": 6, "oK2": 8, "hOK": true, "tOK": false, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026193", "date": "2026-07-22", "actual": "254", "hK": 3, "tK": 3, "oK": 4, "hK2": 0, "tK2": 4, "oK2": 6, "hOK": true, "tOK": true, "oOK": false, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026192", "date": "2026-07-21", "actual": "425", "hK": 4, "tK": 7, "oK": 0, "hK2": 9, "tK2": 9, "oK2": 9, "hOK": false, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026191", "date": "2026-07-20", "actual": "906", "hK": 0, "tK": 8, "oK": 2, "hK2": 3, "tK2": 5, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026190", "date": "2026-07-19", "actual": "026", "hK": 9, "tK": 9, "oK": 4, "hK2": 1, "tK2": 5, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026189", "date": "2026-07-18", "actual": "558", "hK": 4, "tK": 0, "oK": 5, "hK2": 5, "tK2": 2, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": false, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": false}, {"issue": "2026188", "date": "2026-07-17", "actual": "969", "hK": 1, "tK": 7, "oK": 6, "hK2": 6, "tK2": 5, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026187", "date": "2026-07-16", "actual": "023", "hK": 9, "tK": 5, "oK": 0, "hK2": 4, "tK2": 5, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026186", "date": "2026-07-15", "actual": "045", "hK": 1, "tK": 1, "oK": 2, "hK2": 6, "tK2": 7, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026185", "date": "2026-07-14", "actual": "397", "hK": 2, "tK": 2, "oK": 0, "hK2": 9, "tK2": 4, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026184", "date": "2026-07-13", "actual": "902", "hK": 8, "tK": 3, "oK": 6, "hK2": 1, "tK2": 4, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026183", "date": "2026-07-12", "actual": "923", "hK": 5, "tK": 0, "oK": 0, "hK2": 1, "tK2": 5, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026182", "date": "2026-07-11", "actual": "662", "hK": 8, "tK": 3, "oK": 9, "hK2": 0, "tK2": 8, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026181", "date": "2026-07-10", "actual": "818", "hK": 7, "tK": 9, "oK": 0, "hK2": 9, "tK2": 5, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026180", "date": "2026-07-09", "actual": "520", "hK": 3, "tK": 5, "oK": 4, "hK2": 2, "tK2": 6, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026179", "date": "2026-07-08", "actual": "993", "hK": 5, "tK": 8, "oK": 5, "hK2": 7, "tK2": 5, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026178", "date": "2026-07-07", "actual": "266", "hK": 7, "tK": 4, "oK": 8, "hK2": 9, "tK2": 7, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026177", "date": "2026-07-06", "actual": "808", "hK": 2, "tK": 3, "oK": 6, "hK2": 4, "tK2": 5, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": false, "allOK": true, "all6OK": false}, {"issue": "2026176", "date": "2026-07-05", "actual": "269", "hK": 9, "tK": 9, "oK": 2, "hK2": 0, "tK2": 5, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026175", "date": "2026-07-04", "actual": "421", "hK": 7, "tK": 0, "oK": 4, "hK2": 8, "tK2": 0, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026174", "date": "2026-07-03", "actual": "618", "hK": 8, "tK": 5, "oK": 1, "hK2": 4, "tK2": 6, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026173", "date": "2026-07-02", "actual": "677", "hK": 5, "tK": 9, "oK": 9, "hK2": 2, "tK2": 5, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026172", "date": "2026-07-01", "actual": "445", "hK": 9, "tK": 7, "oK": 3, "hK2": 7, "tK2": 5, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026171", "date": "2026-06-30", "actual": "134", "hK": 0, "tK": 9, "oK": 0, "hK2": 9, "tK2": 0, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026170", "date": "2026-06-29", "actual": "805", "hK": 3, "tK": 5, "oK": 6, "hK2": 1, "tK2": 6, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026169", "date": "2026-06-28", "actual": "832", "hK": 6, "tK": 1, "oK": 0, "hK2": 7, "tK2": 7, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026168", "date": "2026-06-27", "actual": "130", "hK": 8, "tK": 7, "oK": 3, "hK2": 0, "tK2": 5, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026167", "date": "2026-06-26", "actual": "631", "hK": 7, "tK": 1, "oK": 0, "hK2": 9, "tK2": 5, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026166", "date": "2026-06-25", "actual": "900", "hK": 8, "tK": 0, "oK": 2, "hK2": 2, "tK2": 3, "oK2": 6, "hOK": true, "tOK": false, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026165", "date": "2026-06-24", "actual": "424", "hK": 1, "tK": 7, "oK": 0, "hK2": 6, "tK2": 8, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026164", "date": "2026-06-23", "actual": "690", "hK": 7, "tK": 1, "oK": 8, "hK2": 0, "tK2": 3, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026163", "date": "2026-06-22", "actual": "537", "hK": 4, "tK": 0, "oK": 0, "hK2": 1, "tK2": 8, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026162", "date": "2026-06-21", "actual": "585", "hK": 3, "tK": 7, "oK": 3, "hK2": 7, "tK2": 2, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": false, "allOK": true, "all6OK": false}, {"issue": "2026161", "date": "2026-06-20", "actual": "529", "hK": 9, "tK": 9, "oK": 4, "hK2": 1, "tK2": 5, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026160", "date": "2026-06-19", "actual": "332", "hK": 5, "tK": 7, "oK": 6, "hK2": 4, "tK2": 5, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026159", "date": "2026-06-18", "actual": "995", "hK": 1, "tK": 4, "oK": 8, "hK2": 3, "tK2": 5, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026158", "date": "2026-06-17", "actual": "178", "hK": 4, "tK": 2, "oK": 7, "hK2": 7, "tK2": 4, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026157", "date": "2026-06-16", "actual": "327", "hK": 1, "tK": 9, "oK": 0, "hK2": 5, "tK2": 0, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026156", "date": "2026-06-15", "actual": "162", "hK": 6, "tK": 5, "oK": 4, "hK2": 4, "tK2": 1, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026155", "date": "2026-06-14", "actual": "409", "hK": 9, "tK": 2, "oK": 0, "hK2": 8, "tK2": 6, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026154", "date": "2026-06-13", "actual": "377", "hK": 4, "tK": 5, "oK": 9, "hK2": 6, "tK2": 6, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026153", "date": "2026-06-12", "actual": "887", "hK": 5, "tK": 2, "oK": 0, "hK2": 9, "tK2": 5, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026152", "date": "2026-06-11", "actual": "220", "hK": 1, "tK": 1, "oK": 3, "hK2": 0, "tK2": 5, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026151", "date": "2026-06-10", "actual": "631", "hK": 8, "tK": 7, "oK": 0, "hK2": 9, "tK2": 5, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026150", "date": "2026-06-09", "actual": "720", "hK": 4, "tK": 3, "oK": 3, "hK2": 2, "tK2": 8, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026149", "date": "2026-06-08", "actual": "696", "hK": 0, "tK": 4, "oK": 4, "hK2": 5, "tK2": 1, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026148", "date": "2026-06-07", "actual": "408", "hK": 3, "tK": 6, "oK": 2, "hK2": 0, "tK2": 4, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026147", "date": "2026-06-06", "actual": "712", "hK": 5, "tK": 0, "oK": 6, "hK2": 1, "tK2": 7, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026146", "date": "2026-06-05", "actual": "464", "hK": 1, "tK": 7, "oK": 5, "hK2": 4, "tK2": 5, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": false, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": false}, {"issue": "2026145", "date": "2026-06-04", "actual": "279", "hK": 7, "tK": 9, "oK": 2, "hK2": 1, "tK2": 1, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026144", "date": "2026-06-03", "actual": "726", "hK": 8, "tK": 7, "oK": 4, "hK2": 9, "tK2": 6, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026143", "date": "2026-06-02", "actual": "376", "hK": 9, "tK": 9, "oK": 6, "hK2": 2, "tK2": 6, "oK2": 0, "hOK": true, "tOK": true, "oOK": false, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026142", "date": "2026-06-01", "actual": "894", "hK": 1, "tK": 1, "oK": 2, "hK2": 6, "tK2": 7, "oK2": 3, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026141", "date": "2026-05-31", "actual": "397", "hK": 2, "tK": 3, "oK": 6, "hK2": 5, "tK2": 8, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026140", "date": "2026-05-30", "actual": "285", "hK": 7, "tK": 4, "oK": 4, "hK2": 5, "tK2": 7, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026139", "date": "2026-05-29", "actual": "286", "hK": 1, "tK": 7, "oK": 0, "hK2": 7, "tK2": 8, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": false, "o2OK": true, "allOK": true, "all6OK": false}, {"issue": "2026138", "date": "2026-05-28", "actual": "790", "hK": 4, "tK": 6, "oK": 3, "hK2": 5, "tK2": 7, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026137", "date": "2026-05-27", "actual": "165", "hK": 7, "tK": 7, "oK": 1, "hK2": 6, "tK2": 5, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026136", "date": "2026-05-26", "actual": "889", "hK": 1, "tK": 1, "oK": 7, "hK2": 9, "tK2": 6, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026135", "date": "2026-05-25", "actual": "487", "hK": 7, "tK": 5, "oK": 6, "hK2": 3, "tK2": 6, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026134", "date": "2026-05-24", "actual": "654", "hK": 0, "tK": 4, "oK": 0, "hK2": 1, "tK2": 3, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026133", "date": "2026-05-23", "actual": "080", "hK": 9, "tK": 3, "oK": 7, "hK2": 4, "tK2": 4, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026132", "date": "2026-05-22", "actual": "756", "hK": 4, "tK": 9, "oK": 3, "hK2": 0, "tK2": 6, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026131", "date": "2026-05-21", "actual": "598", "hK": 9, "tK": 1, "oK": 4, "hK2": 6, "tK2": 5, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026130", "date": "2026-05-20", "actual": "267", "hK": 6, "tK": 7, "oK": 0, "hK2": 6, "tK2": 5, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026129", "date": "2026-05-19", "actual": "023", "hK": 1, "tK": 3, "oK": 6, "hK2": 5, "tK2": 5, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026128", "date": "2026-05-18", "actual": "776", "hK": 5, "tK": 9, "oK": 8, "hK2": 9, "tK2": 5, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026127", "date": "2026-05-17", "actual": "700", "hK": 2, "tK": 4, "oK": 6, "hK2": 3, "tK2": 3, "oK2": 8, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026126", "date": "2026-05-16", "actual": "846", "hK": 9, "tK": 5, "oK": 9, "hK2": 3, "tK2": 6, "oK2": 1, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026125", "date": "2026-05-15", "actual": "954", "hK": 1, "tK": 4, "oK": 0, "hK2": 3, "tK2": 1, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026124", "date": "2026-05-14", "actual": "280", "hK": 3, "tK": 2, "oK": 3, "hK2": 9, "tK2": 5, "oK2": 2, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026123", "date": "2026-05-13", "actual": "200", "hK": 9, "tK": 1, "oK": 7, "hK2": 0, "tK2": 5, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026122", "date": "2026-05-12", "actual": "346", "hK": 7, "tK": 7, "oK": 8, "hK2": 6, "tK2": 1, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026121", "date": "2026-05-11", "actual": "393", "hK": 5, "tK": 3, "oK": 2, "hK2": 2, "tK2": 4, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026120", "date": "2026-05-10", "actual": "734", "hK": 6, "tK": 5, "oK": 0, "hK2": 9, "tK2": 6, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026119", "date": "2026-05-09", "actual": "112", "hK": 8, "tK": 7, "oK": 3, "hK2": 9, "tK2": 6, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026118", "date": "2026-05-08", "actual": "132", "hK": 4, "tK": 5, "oK": 7, "hK2": 0, "tK2": 6, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026117", "date": "2026-05-07", "actual": "411", "hK": 3, "tK": 0, "oK": 4, "hK2": 7, "tK2": 7, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026116", "date": "2026-05-06", "actual": "020", "hK": 7, "tK": 6, "oK": 8, "hK2": 8, "tK2": 8, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026115", "date": "2026-05-05", "actual": "581", "hK": 9, "tK": 4, "oK": 4, "hK2": 3, "tK2": 5, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026114", "date": "2026-05-04", "actual": "864", "hK": 5, "tK": 0, "oK": 6, "hK2": 6, "tK2": 9, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026113", "date": "2026-05-03", "actual": "040", "hK": 4, "tK": 1, "oK": 0, "hK2": 3, "tK2": 6, "oK2": 1, "hOK": true, "tOK": true, "oOK": false, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": false, "all6OK": false}, {"issue": "2026112", "date": "2026-05-02", "actual": "065", "hK": 9, "tK": 9, "oK": 8, "hK2": 2, "tK2": 5, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026111", "date": "2026-05-01", "actual": "863", "hK": 1, "tK": 7, "oK": 2, "hK2": 6, "tK2": 5, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026110", "date": "2026-04-30", "actual": "379", "hK": 7, "tK": 6, "oK": 8, "hK2": 2, "tK2": 9, "oK2": 9, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": false, "allOK": true, "all6OK": false}, {"issue": "2026109", "date": "2026-04-29", "actual": "195", "hK": 5, "tK": 7, "oK": 7, "hK2": 0, "tK2": 6, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026108", "date": "2026-04-28", "actual": "671", "hK": 9, "tK": 1, "oK": 8, "hK2": 5, "tK2": 5, "oK2": 0, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026107", "date": "2026-04-27", "actual": "278", "hK": 0, "tK": 3, "oK": 6, "hK2": 1, "tK2": 9, "oK2": 5, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026106", "date": "2026-04-26", "actual": "928", "hK": 8, "tK": 7, "oK": 3, "hK2": 0, "tK2": 5, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026105", "date": "2026-04-25", "actual": "631", "hK": 5, "tK": 4, "oK": 6, "hK2": 7, "tK2": 9, "oK2": 7, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026104", "date": "2026-04-24", "actual": "482", "hK": 8, "tK": 3, "oK": 9, "hK2": 0, "tK2": 5, "oK2": 6, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}, {"issue": "2026103", "date": "2026-04-23", "actual": "661", "hK": 7, "tK": 4, "oK": 0, "hK2": 9, "tK2": 5, "oK2": 4, "hOK": true, "tOK": true, "oOK": true, "h2OK": true, "t2OK": true, "o2OK": true, "allOK": true, "all6OK": true}], "cumulative": {"h": [100.0, 50.0, 66.67, 75.0, 80.0, 83.33, 85.71, 87.5, 88.89, 90.0, 81.82, 83.33, 84.62, 85.71, 86.67, 87.5, 88.24, 88.89, 89.47, 90.0, 90.48, 90.91, 91.3, 91.67, 92.0, 92.31, 92.59, 92.86, 93.1, 93.33, 93.55, 93.75, 93.94, 94.12, 94.29, 94.44, 94.59, 94.74, 94.87, 95.0, 95.12, 95.24, 95.35, 95.45, 95.56, 95.65, 95.74, 95.83, 95.92, 96.0, 96.08, 96.15, 96.23, 96.3, 96.36, 96.43, 96.49, 96.55, 96.61, 96.67, 96.72, 96.77, 96.83, 96.88, 96.92, 96.97, 97.01, 97.06, 97.1, 97.14, 97.18, 97.22, 97.26, 97.3, 97.33, 97.37, 97.4, 97.44, 97.47, 97.5, 97.53, 97.56, 97.59, 97.62, 97.65, 97.67, 97.7, 97.73, 97.75, 97.78, 97.8, 97.83, 97.85, 97.87, 97.89, 97.92, 97.94, 97.96, 97.98, 98.0], "t": [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 88.89, 90.0, 90.91, 91.67, 92.31, 92.86, 93.33, 93.75, 94.12, 94.44, 94.74, 95.0, 95.24, 95.45, 95.65, 95.83, 96.0, 96.15, 96.3, 96.43, 96.55, 96.67, 96.77, 96.88, 96.97, 97.06, 97.14, 97.22, 94.59, 94.74, 94.87, 95.0, 95.12, 95.24, 95.35, 95.45, 95.56, 95.65, 95.74, 95.83, 95.92, 96.0, 96.08, 96.15, 96.23, 96.3, 96.36, 96.43, 96.49, 96.55, 96.61, 96.67, 96.72, 96.77, 96.83, 96.88, 96.92, 96.97, 97.01, 97.06, 97.1, 97.14, 97.18, 97.22, 97.26, 97.3, 97.33, 97.37, 97.4, 97.44, 97.47, 97.5, 97.53, 97.56, 97.59, 97.62, 97.65, 97.67, 97.7, 97.73, 97.75, 97.78, 97.8, 97.83, 97.85, 97.87, 97.89, 97.92, 97.94, 97.96, 97.98, 98.0], "o": [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 90.0, 90.91, 91.67, 92.31, 92.86, 93.33, 93.75, 94.12, 94.44, 94.74, 95.0, 95.24, 95.45, 95.65, 95.83, 96.0, 96.15, 96.3, 96.43, 96.55, 96.67, 96.77, 96.88, 96.97, 97.06, 97.14, 97.22, 97.3, 97.37, 97.44, 97.5, 97.56, 97.62, 97.67, 97.73, 97.78, 97.83, 97.87, 97.92, 97.96, 98.0, 98.04, 98.08, 98.11, 98.15, 98.18, 98.21, 98.25, 98.28, 98.31, 96.67, 96.72, 96.77, 96.83, 96.88, 96.92, 96.97, 97.01, 97.06, 97.1, 97.14, 97.18, 97.22, 97.26, 97.3, 97.33, 97.37, 97.4, 97.44, 97.47, 97.5, 97.53, 97.56, 97.59, 97.62, 97.65, 97.67, 97.7, 97.73, 97.75, 96.67, 96.7, 96.74, 96.77, 96.81, 96.84, 96.88, 96.91, 96.94, 96.97, 97.0]}};
-
-function buildTable() {
-  const tbody = document.getElementById('backtestBody');
-  let html = '';
-  let cumH = 0, cumT = 0, cumO = 0, cum6 = 0;
-
-  DATA.daily.forEach((r, i) => {
-    if (r.hOK) cumH++;
-    if (r.tOK) cumT++;
-    if (r.oOK) cumO++;
-    const a6 = r.all6OK || false;
-    if (a6) cum6++;
-
-    const rowClass = a6 ? '' : 'row-fail';
-    // 百位: kill1和kill2都对才算对
-    const hAllOk = r.hOK && (r.h2OK !== false);
-    const tAllOk = r.tOK && (r.t2OK !== false);
-    const oAllOk = r.oOK && (r.o2OK !== false);
-    const hClass = hAllOk ? 'cell-ok' : 'cell-fail';
-    const tClass = tAllOk ? 'cell-ok' : 'cell-fail';
-    const oClass = oAllOk ? 'cell-ok' : 'cell-fail';
-    const a6Icon = a6 ? '✅' : '❌';
-
-    html += `<tr class="${rowClass}">
-      <td>${r.issue}</td>
-      <td>${r.date}</td>
-      <td class="cell-actual"><strong>${r.actual}</strong></td>
-      <td class="cell-kill">${r.hK},${r.hK2}</td>
-      <td class="${hClass}">${hAllOk ? '✓' : '✗'}</td>
-      <td class="cell-kill">${r.tK},${r.tK2}</td>
-      <td class="${tClass}">${tAllOk ? '✓' : '✗'}</td>
-      <td class="cell-kill">${r.oK},${r.oK2}</td>
-      <td class="${oClass}">${oAllOk ? '✓' : '✗'}</td>
-      <td>${a6Icon}</td>
-    </tr>`;
-
-    if ((i+1) % 25 === 0 && i < DATA.daily.length - 1) {
-      html += `<tr class="summary-row">
-        <td colspan="10">↑ 以上${i+1}期：3杀 ${(cumH+cumT+cumO)}/300 | 6杀全中 ${cum6}/${i+1} = ${(cum6/(i+1)*100).toFixed(1)}%</td>
-      </tr>`;
-    }
-  });
-
-  tbody.innerHTML = html;
-}
-
-buildTable();
-</script>
-
 </body>
 </html>
