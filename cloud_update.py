@@ -1,9 +1,9 @@
 """
-福彩3D 百十个杀码 — 云端全自动更新
+福彩3D 百十个杀码 — 云端全自动更新 V9
 =============================================
-6数据源降级获取 → 追加CSV → V8引擎回测 → 生成HTML → GitHub Pages
+6数据源降级获取 → 追加CSV → V9引擎回测 → 生成HTML → GitHub Pages
 三重cron兜底: 北京22:00/23:30/01:00 (UTC 14:00/15:30/17:00)
-十位V8a: sum_odd b²+s²=0修复 + span_ge6 b最大修复 → 200期98.5%
+V9: V8三杀码 + 每位置独立第二杀码（6杀制）
 """
 import csv, json, os, re, sys, io
 from datetime import datetime, timezone, timedelta
@@ -234,6 +234,25 @@ def kill_o(b, s, g, fail_state=None, period_idx=None):
 
 O_FB = [lambda b,s,g:(b+s+g+1)%10, lambda b,s,g:(b*s)%10]
 
+# ── V9: 第二杀码 ──────────────────────────────────
+def kill_h2(b, s, g):
+    k = (b*b + s + g) % 10
+    k1 = kill_h(b, s, g)
+    if k == k1: k = (k + 1) % 10
+    return k
+
+def kill_t2(b, s, g):
+    k = (b * s) % 10
+    k1 = kill_t(b, s, g)
+    if k == k1: k = (k + 1) % 10
+    return k
+
+def kill_o2(b, s, g):
+    k = (b + s + g + 7) % 10
+    k1 = kill_o(b, s, g)
+    if k == k1: k = (k + 1) % 10
+    return k
+
 def apply_fb(kill, prev, fb_list, b, s, g):
     if kill != prev: return kill
     for f in fb_list:
@@ -250,6 +269,8 @@ def compute_backtest(data):
 
     phk = ptk = pok = None
     cor = {"h":0,"t":0,"o":0}
+    cor2 = {"h":0,"t":0,"o":0}
+    all6 = 0
     results = []
     o_fail = {}
 
@@ -265,15 +286,26 @@ def compute_backtest(data):
 
         if i >= start:
             cr = data[i]
+            # V9: kill2
+            hk2 = kill_h2(b,s,g); tk2 = kill_t2(b,s,g); ok2 = kill_o2(b,s,g)
             ho = cr["b"] != phk; to = cr["s"] != ptk; oo = cr["g"] != pok
+            h2o = cr["b"] != hk2; t2o = cr["s"] != tk2; o2o = cr["g"] != ok2
             if ho: cor["h"] += 1
             if to: cor["t"] += 1
             if oo: cor["o"] += 1
+            if h2o: cor2["h"] += 1
+            if t2o: cor2["t"] += 1
+            if o2o: cor2["o"] += 1
+            if ho and to and oo and h2o and t2o and o2o: all6 += 1
             results.append({
                 "issue": cr["issue"], "date": cr["date"],
                 "open": f'{cr["b"]}{cr["s"]}{cr["g"]}',
                 "hK": phk, "tK": ptk, "oK": pok,
-                "hOK": ho, "tOK": to, "oOK": oo, "allOK": ho and to and oo
+                "hK2": hk2, "tK2": tk2, "oK2": ok2,
+                "hOK": ho, "tOK": to, "oOK": oo,
+                "h2OK": h2o, "t2OK": t2o, "o2OK": o2o,
+                "allOK": ho and to and oo,
+                "all6OK": ho and to and oo and h2o and t2o and o2o
             })
     results.reverse()
 
@@ -282,10 +314,12 @@ def compute_backtest(data):
         "h": apply_fb(kill_h(b,s,g), phk, H_FB, b,s,g),
         "t": apply_fb(kill_t(b,s,g), ptk, T_FB, b,s,g),
         "o": apply_fb(kill_o(b,s,g, o_fail, total), pok, O_FB, b,s,g),
+        "h2": kill_h2(b,s,g), "t2": kill_t2(b,s,g), "o2": kill_o2(b,s,g),
     }
 
     n = len(results)
     period_correct_100 = sum(1 for r in results[:100] if r["allOK"])
+    period6_correct_100 = sum(1 for r in results[:100] if r.get("all6OK", False))
     n100 = min(100, n)
 
     return {
@@ -297,6 +331,9 @@ def compute_backtest(data):
             "acc_all": (cor["h"]+cor["t"]+cor["o"])/(n*3)*100,
             "acc_period_100": period_correct_100 / n100 * 100,
             "period_correct_100": period_correct_100, "period_n_100": n100,
+            "acc_h2": cor2["h"]/n*100, "acc_t2": cor2["t"]/n*100, "acc_o2": cor2["o"]/n*100,
+            "all6": all6, "all6_pct": all6/n*100,
+            "period6_correct_100": period6_correct_100, "period6_pct_100": period6_correct_100/n100*100,
         },
         "predictions": next_kill,
         "results": results
@@ -344,19 +381,19 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 </style>
 </head>
 <body>
-<h1>福彩3D 百十个杀码预测 V8</h1>
+<h1>福彩3D 百十个杀码预测 V9</h1>
 
 <div class="pred">
-<div class="badge">🔮 下一期预测</div>
+<div class="badge">🔮 下一期预测（6杀制）</div>
 <div class="issue">第 <strong>{next_issue}</strong> 期</div>
 <div class="poses">
-<div class="pos"><div class="pos-label">百位杀码</div><div class="pos-num">{pred_h}</div></div>
-<div class="pos"><div class="pos-label">十位杀码</div><div class="pos-num">{pred_t}</div></div>
-<div class="pos"><div class="pos-label">个位杀码</div><div class="pos-num">{pred_o}</div></div>
+<div class="pos"><div class="pos-label">百位杀码</div><div class="pos-num">{pred_h},{pred_h2}</div></div>
+<div class="pos"><div class="pos-label">十位杀码</div><div class="pos-num">{pred_t},{pred_t2}</div></div>
+<div class="pos"><div class="pos-label">个位杀码</div><div class="pos-num">{pred_o},{pred_o2}</div></div>
 </div>
 </div>
 
-<div class="section-title"><span class="dot"></span>近{backtest_n}期回测准确率</div>
+<div class="section-title"><span class="dot"></span>近{backtest_n}期回测准确率（3杀）</div>
 <div class="stats">
 <div class="stat"><div class="sv">{acc_h:.1f}%</div><div class="sl">百位</div><div class="se">错{err_h}期</div></div>
 <div class="stat"><div class="sv">{acc_t:.1f}%</div><div class="sl">十位</div><div class="se">错{err_t}期</div></div>
@@ -365,7 +402,12 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 
 <div class="period-stat">
 <div class="pv">{period_correct_100}/{period_n_100} = {acc_period_100:.1f}%</div>
-<div class="pl">近{period_n_100}期综合（按「期」统计 · 三期全对才算一期正确）</div>
+<div class="pl">近{period_n_100}期综合（3杀全对）</div>
+</div>
+
+<div class="period-stat" style="margin-top:8px;background:#1a1a2e;border-color:#e94560">
+<div class="pv" style="color:#e94560">{period6_correct_100}/{period_n_100} = {period6_pct_100:.1f}%</div>
+<div class="pl">近{period_n_100}期6杀全中（V9双杀码）</div>
 </div>
 
 <div class="info-card">
@@ -401,15 +443,17 @@ def generate_html(bt):
     pred = bt["predictions"]
     rows = ""
     for r in bt["results"]:
-        h_mark = f'<span class="ok">✅{r["hK"]}</span>' if r["hOK"] else f'<span class="bad">❌{r["hK"]}</span>'
-        t_mark = f'<span class="ok">✅{r["tK"]}</span>' if r["tOK"] else f'<span class="bad">❌{r["tK"]}</span>'
-        o_mark = f'<span class="ok">✅{r["oK"]}</span>' if r["oOK"] else f'<span class="bad">❌{r["oK"]}</span>'
-        all_mark = "✅" if r["allOK"] else "❌"
+        h_mark = f'<span class="ok">✅{r["hK"]},{r["hK2"]}</span>' if r["hOK"] and r.get("h2OK",True) else f'<span class="bad">❌{r["hK"]},{r["hK2"]}</span>'
+        t_mark = f'<span class="ok">✅{r["tK"]},{r["tK2"]}</span>' if r["tOK"] and r.get("t2OK",True) else f'<span class="bad">❌{r["tK"]},{r["tK2"]}</span>'
+        o_mark = f'<span class="ok">✅{r["oK"]},{r["oK2"]}</span>' if r["oOK"] and r.get("o2OK",True) else f'<span class="bad">❌{r["oK"]},{r["oK2"]}</span>'
+        all6 = r.get("all6OK", r["allOK"])
+        all_mark = "✅" if all6 else "❌"
         rows += f'<tr><td>{r["issue"]}</td><td>{r["date"]}</td><td>{r["open"]}</td><td>{h_mark}</td><td>{t_mark}</td><td>{o_mark}</td><td>{all_mark}</td></tr>\n'
 
     html = HTML_TEMPLATE.format(
         next_issue=meta["next_issue"],
         pred_h=pred["h"], pred_t=pred["t"], pred_o=pred["o"],
+        pred_h2=pred["h2"], pred_t2=pred["t2"], pred_o2=pred["o2"],
         backtest_n=meta["backtest_n"],
         acc_h=meta["acc_h"], acc_t=meta["acc_t"], acc_o=meta["acc_o"],
         err_h=meta["err_h"], err_t=meta["err_t"], err_o=meta["err_o"],
@@ -417,6 +461,8 @@ def generate_html(bt):
         acc_period_100=meta["acc_period_100"],
         period_correct_100=meta["period_correct_100"],
         period_n_100=meta["period_n_100"],
+        period6_correct_100=meta["period6_correct_100"],
+        period6_pct_100=meta["period6_pct_100"],
         table_rows=rows,
         latest_date=meta["latest_date"], total=meta["total"],
     )
@@ -424,7 +470,7 @@ def generate_html(bt):
 
 # ── MAIN ──────────────────────────────────────────────
 if __name__ == "__main__":
-    print("福彩3D 百十个杀码 · 云端更新 V8")
+    print("福彩3D 百十个杀码 · 云端更新 V9")
 
     # Step 1: 获取最新数据
     print("📡 获取最新开奖...")
