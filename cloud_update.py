@@ -243,7 +243,8 @@ def kill_h2(b, s, g):
     return k
 
 def kill_t2(b, s, g):
-    k = (b * s) % 10
+    mid = sorted([b, s, g])[1]
+    k = (s - mid + 5) % 10
     k1 = kill_t(b, s, g)
     if k == k1: k = (k + 1) % 10
     return k
