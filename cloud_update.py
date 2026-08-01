@@ -12,6 +12,11 @@ TZ = timezone(timedelta(hours=8))
 CSV_PATH = "fc3d-history.csv"
 OUT_HTML = "index.html"
 BACKTEST_N = 100
+KILL6_HISTORY = "kill6_history.json"
+# 升级触发条件 (满足任一即重新穷举6个算法)
+TRIG_BELOW_PCT = 70.0      # 滚动100期6杀全中率跌破此值
+TRIG_MONTH_DROP_PP = 8.0   # 单月(30天)下滑超过此pp
+TRIG_MONTH_DAYS = 30
 
 # ── 数据获取 (6源降级) ────────────────────────────────
 def http_get(url, timeout=15):
@@ -222,6 +227,46 @@ def apply_fb(kill, prev, fb_list, b, s, g):
         if alt != prev: return alt
     return (kill + 1) % 10
 
+# ── 升级触发检测器 ─────────────────────────────────────
+def record_kill6(pct, issue, date):
+    """把每日6杀全中率追加到历史文件, 用于单月下滑检测"""
+    hist = []
+    if os.path.exists(KILL6_HISTORY):
+        try:
+            hist = json.load(open(KILL6_HISTORY, encoding="utf-8"))
+        except: hist = []
+    # 同期号不重复记录
+    if hist and hist[-1].get("issue") == issue:
+        hist[-1].update({"pct": round(pct, 2), "date": date})
+    else:
+        hist.append({"issue": issue, "date": date, "pct": round(pct, 2)})
+    hist = hist[-400:]  # 只留最近400条(约1年)
+    json.dump(hist, open(KILL6_HISTORY, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return hist
+
+def check_upgrade_trigger(cur_pct, hist):
+    """检测两个升级触发条件, 返回 (是否触发, 触发原因列表, 当月下滑pp)"""
+    reasons = []
+    # 条件1: 当前滚动100期6杀全中率跌破阈值
+    if cur_pct < TRIG_BELOW_PCT:
+        reasons.append(f"6杀全中率 {cur_pct:.1f}% 跌破 {TRIG_BELOW_PCT:.0f}%")
+    # 条件2: 单月下滑超阈值 — 找约30天前的记录
+    drop = 0.0
+    if len(hist) >= 2:
+        from datetime import date as _d
+        try:
+            cur_d = datetime.strptime(hist[-1]["date"], "%Y-%m-%d")
+            ref = None
+            for h in reversed(hist[:-1]):
+                if (cur_d - datetime.strptime(h["date"], "%Y-%m-%d")).days >= TRIG_MONTH_DAYS:
+                    ref = h; break
+            if ref is None: ref = hist[0]
+            drop = ref["pct"] - cur_pct
+            if drop >= TRIG_MONTH_DROP_PP:
+                reasons.append(f"单月下滑 {drop:.1f}pp (从{ref['date']}的{ref['pct']:.1f}%) 超过 {TRIG_MONTH_DROP_PP:.0f}pp")
+        except: pass
+    return (len(reasons) > 0), reasons, drop
+
 def next_issue_calc(last):
     """跨年安全: 福彩3D年末最后一期后回绕到次年001.
     优先用数据源给的next_code(已含回绕); 兜底按日期判断(12-31开奖→次年001)."""
@@ -346,6 +391,8 @@ h1{{font-size:18px;text-align:center;color:#1a237e;margin:8px 0 12px}}
 .info-card{{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:12px;line-height:1.7}}
 .info-card h3{{font-size:13px;color:#37474f;margin-bottom:6px}}
 .warn{{background:#fff3e0;border-left:3px solid #ff9800;padding:10px 12px;border-radius:0 8px 8px 0;font-size:11px;margin-top:8px;color:#e65100}}
+.upgrade-alert{{background:linear-gradient(135deg,#b71c1c,#d32f2f);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;box-shadow:0 2px 8px rgba(183,28,28,.3)}}
+.upgrade-alert .ua-title{{font-size:15px;font-weight:800;margin-bottom:4px}}
 table{{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}}
 th{{background:#eceff1;padding:8px 6px;text-align:center;font-weight:600;color:#455a64;position:sticky;top:0}}
 td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
@@ -368,6 +415,7 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 <div class="pos"><div class="pos-label">个位杀码</div><div class="pos-num">{pred_o},{pred_o2}</div></div>
 </div>
 </div>
+{upgrade_banner}
 
 <div class="section-title"><span class="dot"></span>近{backtest_n}期回测（3杀+6杀）</div>
 <div class="stats">
@@ -423,7 +471,20 @@ def generate_html(bt):
         all_mark = "✅" if all6 else "❌"
         rows += f'<tr><td>{r["issue"]}</td><td>{r["date"]}</td><td>{r["open"]}</td><td>{h_mark}</td><td>{t_mark}</td><td>{o_mark}</td><td>{all_mark}</td></tr>\n'
 
+    # 升级触发告警横幅
+    upgrade_banner = ""
+    if meta.get("upgrade_triggered"):
+        rsn = "<br>".join("• " + r for r in meta.get("upgrade_reasons", []))
+        upgrade_banner = (
+            '<div class="upgrade-alert">'
+            '<div class="ua-title">🚨 算法升级触发</div>'
+            '6杀全中率已触及升级阈值，建议重新穷举6个算法：<br>' + rsn +
+            '<br><span style="font-size:11px;opacity:.85">触发条件：滚动100期跌破 '
+            + f'{TRIG_BELOW_PCT:.0f}% 或 单月下滑超 {TRIG_MONTH_DROP_PP:.0f}pp</span></div>'
+        )
+
     html = HTML_TEMPLATE.format(
+        upgrade_banner=upgrade_banner,
         next_issue=meta["next_issue"],
         pred_h=pred["h"], pred_t=pred["t"], pred_o=pred["o"],
         pred_h2=pred["h2"], pred_t2=pred["t2"], pred_o2=pred["o2"],
@@ -473,6 +534,20 @@ if __name__ == "__main__":
     print(f"   kill2: 百{meta['acc_h2']:.1f}% 十{meta['acc_t2']:.1f}% 个{meta['acc_o2']:.1f}%")
     print(f"   6杀全中: {meta['all6']}/{meta['backtest_n']} = {meta['all6_pct']:.1f}%")
     print(f"   近100期综合(按期): {meta['period_correct_100']}/{meta['period_n_100']} = {meta['acc_period_100']:.1f}%")
+    print(f"   近100期6杀全中: {meta['period6_correct_100']}/{meta['period_n_100']} = {meta['period6_pct_100']:.1f}%")
+
+    # Step 3.5: 升级触发检测
+    hist = record_kill6(meta["period6_pct_100"], meta["latest_issue"], meta["latest_date"])
+    triggered, reasons, month_drop = check_upgrade_trigger(meta["period6_pct_100"], hist)
+    meta["upgrade_triggered"] = triggered
+    meta["upgrade_reasons"] = reasons
+    meta["month_drop"] = round(month_drop, 1)
+    if triggered:
+        print(f"\n🚨🚨🚨 升级触发！建议重新穷举6个算法 🚨🚨🚨")
+        for r in reasons:
+            print(f"   ⚠️ {r}")
+    else:
+        print(f"   ✅ 升级触发器: 正常 (单月{month_drop:+.1f}pp, 阈值跌破{TRIG_BELOW_PCT:.0f}%/月降{TRIG_MONTH_DROP_PP:.0f}pp)")
 
     # Step 4: 生成HTML
     html = generate_html(bt)
