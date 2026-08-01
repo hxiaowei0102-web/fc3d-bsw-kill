@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>福彩3D 百十个杀码预测 V9</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fa; color: #2c3e50; min-height:100vh; }
@@ -39,8 +38,6 @@ body { font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
 .stat-card.t .stat-val { color:#1565c0; }
 .stat-card.o .stat-val { color:#e65100; }
 .stat-card.a6 .stat-val { color:#e94560; }
-.chart-container { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:24px; }
-.chart-container canvas { max-height:320px; }
 .table-wrap { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; margin-bottom:24px; }
 .table-scroll { max-height:600px; overflow-y:auto; }
 table { width:100%; border-collapse:collapse; font-size:12px; }
@@ -151,16 +148,6 @@ tr.row-fail:hover td { background:#ffe8e0; }
   </div>
 </div>
 
-<!-- Chart -->
-<div class="chart-container">
-  <div id="chartLegend" style="display:flex;gap:20px;justify-content:center;margin-bottom:8px;font-size:12px;color:#78909c;">
-    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#4caf50;display:inline-block;border-radius:2px;"></span> 百位</span>
-    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#2196f3;display:inline-block;border-radius:2px;"></span> 十位</span>
-    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#ff9800;display:inline-block;border-radius:2px;"></span> 个位</span>
-  </div>
-  <canvas id="cumulativeChart"></canvas>
-</div>
-
 <!-- Backtest Table: 100期 6杀明细 -->
 <div class="section-title"><span class="dot"></span>近100期回测明细（6杀码 · 近期→远期）</div>
 <div class="legend">
@@ -256,40 +243,7 @@ function buildTable() {
   tbody.innerHTML = html;
 }
 
-function buildChart() {
-  const ctx = document.getElementById('cumulativeChart').getContext('2d');
-  const labels = DATA.daily.map(r => r.issue);
-  const hData = DATA.cumulative.h;
-  const tData = DATA.cumulative.t;
-  const oData = DATA.cumulative.o;
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: '百位', data: hData, borderColor: '#4caf50', borderWidth: 2, pointRadius: 0, tension: 0.15 },
-        { label: '十位', data: tData, borderColor: '#2196f3', borderWidth: 2, pointRadius: 0, tension: 0.15 },
-        { label: '个位', data: oData, borderColor: '#ff9800', borderWidth: 2, pointRadius: 0, tension: 0.15 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { intersect: false, mode: 'index' },
-      plugins: {
-        legend: { display: false },
-        tooltip: { backgroundColor: '#1a237e', callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%' } }
-      },
-      scales: {
-        x: { ticks: { maxTicksLimit: 10, font: { size:10 }, color: '#90a4ae' }, grid: { display:false } },
-        y: { min: 85, max: 100, ticks: { stepSize: 1, font: { size:10 }, color: '#90a4ae', callback: v => v + '%' }, grid: { color:'#f0f0f0' } }
-      }
-    }
-  });
-}
-
 buildTable();
-buildChart();
 </script>
 
 </body>
