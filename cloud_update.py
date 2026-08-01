@@ -250,7 +250,7 @@ def kill_t2(b, s, g):
     return k
 
 def kill_o2(b, s, g):
-    k = (b + s + g + 7) % 10
+    k = (g*g + abs(b-g)) % 10
     k1 = kill_o(b, s, g)
     if k == k1: k = (k + 1) % 10
     return k
