@@ -43,7 +43,8 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add fc3d-history.csv index.html 2>/dev/null || true
+          # 提交数据+页面+升级监控历史(kill6_history.json必须入库, 否则单月下滑检测失效)
+          git add fc3d-history.csv index.html kill6_history.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "无变更"
           else

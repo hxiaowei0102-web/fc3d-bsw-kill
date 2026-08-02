@@ -6,9 +6,7 @@
 V9: V8三杀码 + 每位置独立第二杀码（6杀制）
 """
 import csv, json, os, re, sys, io
-from datetime import datetime, timezone, timedelta
-
-TZ = timezone(timedelta(hours=8))
+from datetime import datetime
 CSV_PATH = "fc3d-history.csv"
 OUT_HTML = "index.html"
 BACKTEST_N = 100
@@ -19,21 +17,18 @@ TRIG_MONTH_DROP_PP = 8.0   # 单月(30天)下滑超过此pp
 TRIG_MONTH_DAYS = 30
 
 # ── 数据获取 (6源降级) ────────────────────────────────
-def http_get(url, timeout=15):
+def http_get(url, timeout=15, ua=None):
+    headers = {"User-Agent": ua or "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
         import requests
-        r = requests.get(url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }, timeout=timeout)
+        r = requests.get(url, headers=headers, timeout=timeout)
         if r.status_code == 200:
             r.encoding = "utf-8"
             return r.text
     except: pass
     try:
         import urllib.request
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        })
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return resp.read().decode("utf-8", errors="ignore")
     except: pass
@@ -41,13 +36,12 @@ def http_get(url, timeout=15):
 
 def fetch_latest():
     """多数据源依次尝试, 拿新数据就停 (2026-08-03四级结构)
-    ①灰鸟API(带next_code跨年安全) ②17500.cn(官方级全量TXT) ③apihz(公共key,已死) ④中彩网(缓存页)
-    """
+    ①灰鸟API(带next_code跨年安全) ②17500.cn(官方级全量TXT, 带429重试)
+    中彩网已移除: 2026-08实测返回WAF反爬页(标题40..), 永远解析失败浪费请求
+    返回 (data, alive): alive=True表示至少一个源成功返回数据(期号可能<=本地, 属正常无新期)"""
     sources = [
         ("灰鸟API", lambda: fetch_huiniao()),
         ("17500.cn", lambda: fetch_17500()),
-        ("apihz", lambda: fetch_apihz()),
-        ("中彩网", lambda: fetch_zhcw()),
     ]
 
     last_issue = None
@@ -56,19 +50,21 @@ def fetch_latest():
         if rows: last_issue = rows[-1]["issue"]
     except: pass
 
+    alive = False
     for name, fn in sources:
         try:
             data = fn()
             if not data: continue
+            alive = True  # 源成功返回数据即视为活着
             # 期号合理性校验: 必须 > 本地最新期号, 否则视为缓存/旧数据拒绝
             if last_issue and str(data["issue"]) <= str(last_issue):
-                print(f"  ⏭️ {name}: 期号{data['issue']}<=本地{last_issue}, 跳过(缓存/旧数据)")
+                print(f"  ⏭️ {name}: 期号{data['issue']}<=本地{last_issue}, 跳过(无新期, 源正常)")
                 continue
             print(f"  ✅ {name}: {data['issue']} ({data['date']}) {data['b']}{data['s']}{data['g']}")
-            return data
+            return data, True
         except Exception as e:
             print(f"  ⚠️ {name}: {e}")
-    return None
+    return None, alive
 
 def fetch_huiniao():
     url = "http://api.huiniao.top/interface/home/lotteryHistory?type=fcsd&page=1&limit=1"
@@ -82,9 +78,19 @@ def fetch_huiniao():
 
 def fetch_17500():
     """17500.cn 官方级全量TXT (2002至今, 每行: 期号 日期 百 十 个 ...)
-    https://www.17500.cn/getData/3d.TXT  — 2026-08实测真源, 与灰鸟数据交叉验证一致"""
+    https://www.17500.cn/getData/3d.TXT — 2026-08实测真源, 与灰鸟数据交叉验证一致
+    注意: 该站有反爬限流(偶发429), 失败自动重试3次+换UA"""
     url = "https://www.17500.cn/getData/3d.TXT"
-    text = http_get(url)
+    uas = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        "Python-urllib/3.11",
+    ]
+    text = None
+    for attempt in range(3):
+        text = http_get(url, ua=uas[attempt % len(uas)])
+        if text: break
+        import time; time.sleep(2)  # 429限流时等待重试
     if not text: return None
     lines = [l.strip() for l in text.splitlines() if l.strip()]
     if not lines: return None
@@ -96,22 +102,10 @@ def fetch_17500():
                 "b": int(last[2]), "s": int(last[3]), "g": int(last[4])}
     except: return None
 
-# ── 失效数据源(保留函数, 自动跳过) ────────────────────
-def fetch_apihz():
-    """apihz - 公共key JSON. 2026-08实测接口404已死, 保留占位"""
-    return None
-
-# ── 备份数据源 ────────────────────────────────────────
-def fetch_zhcw():
-    """中彩网 - 官方福彩数据"""
-    url = "https://www.zhcw.com/kjxx/fc3d/"
-    text = http_get(url)
-    if not text: return None
-    m = re.search(r'<em>(\d{7})</em>.*?<em>(\d{4}-\d{2}-\d{2})</em>.*?<i>(\d)</i>\s*<i>(\d)</i>\s*<i>(\d)</i>', text, re.DOTALL)
-    if not m:
-        m = re.search(r'(\d{7})期.*?(\d{4}-\d{2}-\d{2}).*?(\d)\s*(\d)\s*(\d)', text, re.DOTALL)
-    if not m: return None
-    return {"issue": m.group(1), "date": m.group(2), "b": int(m.group(3)), "s": int(m.group(4)), "g": int(m.group(5))}
+# ── 历史数据源(已失效, 保留说明) ────────────────────
+# apihz: 公共key JSON, 2026-08实测接口404已死
+# 中彩网: WAF反爬页(标题40..), 正则永远解析失败
+# 8200/55128/彩经网: DNS失败/拒连/403, 2026-07移除
 
 # ── CSV 操作 ──────────────────────────────────────────
 def load_csv(path):
@@ -418,6 +412,8 @@ h1{{font-size:18px;text-align:center;color:#1a237e;margin:8px 0 12px}}
 .warn{{background:#fff3e0;border-left:3px solid #ff9800;padding:10px 12px;border-radius:0 8px 8px 0;font-size:11px;margin-top:8px;color:#e65100}}
 .upgrade-alert{{background:linear-gradient(135deg,#b71c1c,#d32f2f);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;box-shadow:0 2px 8px rgba(183,28,28,.3)}}
 .upgrade-alert .ua-title{{font-size:15px;font-weight:800;margin-bottom:4px}}
+.data-alert{{background:linear-gradient(135deg,#e65100,#f57c00);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;box-shadow:0 2px 8px rgba(230,81,0,.3)}}
+.data-alert .da-title{{font-size:15px;font-weight:800;margin-bottom:4px}}
 table{{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}}
 th{{background:#eceff1;padding:8px 6px;text-align:center;font-weight:600;color:#455a64;position:sticky;top:0}}
 td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
@@ -440,6 +436,7 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 <div class="pos"><div class="pos-label">个位杀码</div><div class="pos-num">{pred_o},{pred_o2}</div></div>
 </div>
 </div>
+{data_banner}
 {upgrade_banner}
 
 <div class="section-title"><span class="dot"></span>近{backtest_n}期回测（3杀+6杀）</div>
@@ -484,7 +481,7 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 </body>
 </html>'''
 
-def generate_html(bt):
+def generate_html(bt, data_ok=True):
     meta = bt["meta"]
     pred = bt["predictions"]
     rows = ""
@@ -508,7 +505,18 @@ def generate_html(bt):
             + f'{TRIG_BELOW_PCT:.0f}% 或 单月下滑超 {TRIG_MONTH_DROP_PP:.0f}pp</span></div>'
         )
 
+    # 数据异常告警横幅
+    data_banner = ""
+    if not data_ok:
+        data_banner = (
+            '<div class="data-alert">'
+            '<div class="da-title">⚠️ 数据源异常</div>'
+            '所有数据源获取失败，页面为最后一次成功数据，请检查数据源（灰鸟/17500）。'
+            '</div>'
+        )
+
     html = HTML_TEMPLATE.format(
+        data_banner=data_banner,
         upgrade_banner=upgrade_banner,
         next_issue=meta["next_issue"],
         pred_h=pred["h"], pred_t=pred["t"], pred_o=pred["o"],
@@ -535,13 +543,19 @@ if __name__ == "__main__":
 
     # Step 1: 获取最新数据
     print("📡 获取最新开奖...")
-    new_data = fetch_latest()
+    new_data, data_alive = fetch_latest()
     if new_data:
         added = append_csv(CSV_PATH, new_data)
         if added:
             print(f"  ✅ 已追加第{new_data['issue']}期 ({new_data['date']}) {new_data['b']}{new_data['s']}{new_data['g']}")
         else:
             print(f"  ℹ️ 第{new_data['issue']}期已存在, 无需追加")
+    elif not data_alive:
+        # 所有数据源全挂: 醒目告警, 页面加横幅
+        print("\n🚨🚨🚨 所有数据源均失败! 页面将显示旧数据, 请检查数据源 🚨🚨🚨")
+    else:
+        # 源活着但无新期(当天开奖前运行) — 正常, 不告警
+        print("  ℹ️ 数据源正常但无新一期(开奖前运行), 继续用现有数据")
 
     # Step 2: 加载数据
     data = load_csv(CSV_PATH)
@@ -574,8 +588,8 @@ if __name__ == "__main__":
     else:
         print(f"   ✅ 升级触发器: 正常 (单月{month_drop:+.1f}pp, 阈值跌破{TRIG_BELOW_PCT:.0f}%/月降{TRIG_MONTH_DROP_PP:.0f}pp)")
 
-    # Step 4: 生成HTML
-    html = generate_html(bt)
+    # Step 4: 生成HTML (data_ok = 源活着, 源死才挂横幅)
+    html = generate_html(bt, data_ok=data_alive)
     with open(OUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
 

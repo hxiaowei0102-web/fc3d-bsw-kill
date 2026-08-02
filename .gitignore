@@ -3,10 +3,10 @@ __pycache__/
 .workbuddy/
 prediction_data.json
 backtest_100.json
-kill6_history.json
 decay_analysis.py
 fetch_data.py
 *.bat
+# kill6_history.json 必须入库! 云端Actions靠它累积历史实现单月下滑检测(2026-08-03修复)
 # 实验/搜索/审计脚本不入库(避免回溯风险), 但核心引擎必须入库:
 #   cloud_update.py(云端) / predict_engine.py(本地引擎) / build_html.py(HTML生成)
 search_*.py
