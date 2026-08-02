@@ -40,10 +40,14 @@ def http_get(url, timeout=15):
     return None
 
 def fetch_latest():
-    """多数据源依次尝试, 拿新数据就停 (2026-08审计后精简: apihz/8200/55128/彩经网/中彩网均已失效)"""
+    """多数据源依次尝试, 拿新数据就停 (2026-08-03四级结构)
+    ①灰鸟API(带next_code跨年安全) ②17500.cn(官方级全量TXT) ③apihz(公共key,已死) ④中彩网(缓存页)
+    """
     sources = [
         ("灰鸟API", lambda: fetch_huiniao()),
-        ("中彩网", lambda: fetch_zhcw()),       # 备份(页面常为缓存, 期号校验拦截)
+        ("17500.cn", lambda: fetch_17500()),
+        ("apihz", lambda: fetch_apihz()),
+        ("中彩网", lambda: fetch_zhcw()),
     ]
 
     last_issue = None
@@ -75,6 +79,27 @@ def fetch_huiniao():
     item = data["data"]["data"]["list"][0]
     return {"issue": item["code"], "date": item["day"], "b": item["one"], "s": item["two"], "g": item["three"],
             "next_issue": item.get("next_code")}
+
+def fetch_17500():
+    """17500.cn 官方级全量TXT (2002至今, 每行: 期号 日期 百 十 个 ...)
+    https://www.17500.cn/getData/3d.TXT  — 2026-08实测真源, 与灰鸟数据交叉验证一致"""
+    url = "https://www.17500.cn/getData/3d.TXT"
+    text = http_get(url)
+    if not text: return None
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not lines: return None
+    last = lines[-1].split()
+    if len(last) < 5 or not re.match(r'20\d{5}$', last[0]):
+        return None
+    try:
+        return {"issue": last[0], "date": last[1],
+                "b": int(last[2]), "s": int(last[3]), "g": int(last[4])}
+    except: return None
+
+# ── 失效数据源(保留函数, 自动跳过) ────────────────────
+def fetch_apihz():
+    """apihz - 公共key JSON. 2026-08实测接口404已死, 保留占位"""
+    return None
 
 # ── 备份数据源 ────────────────────────────────────────
 def fetch_zhcw():
@@ -434,7 +459,7 @@ td{{padding:6px;text-align:center;border-bottom:1px solid #f0f0f0}}
 <div class="info-card">
 <h3>📋 V9 六杀引擎</h3>
 <p><strong>每位置双杀码：</strong>kill1（V8条件决策树）+ kill2（独立算术公式）<br>
-<strong>kill2公式：</strong>百=(b²+s+g)%10 · 十=(b*s)%10 · 个=(b+s+g+7)%10<br>
+<strong>kill2公式：</strong>百=(b-span+9)%10 · 十=(s-mid+5)%10 · 个=(g²+|b-g|)%10<br>
 <strong>重叠处理：</strong>kill2==kill1时自动+1偏移<br>
 <strong>6杀全中：</strong>近100期 <strong>{all6_pct:.1f}%</strong> · 全量≈53%（基线51.2%）</p>
 <div class="warn">

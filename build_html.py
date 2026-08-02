@@ -187,14 +187,14 @@ tr.row-fail:hover td {{ background:#ffe8e0; }}
 <div class="info-card">
   <h3>🔬 V9 六杀引擎</h3>
   <p><strong>每位置双杀码：</strong>kill1（V8条件决策树）+ kill2（独立算术公式），6杀全中为命中</p>
-  <p><strong>kill2公式：</strong>百位=(b²+s+g)%10 · 十位=(b*s)%10 · 个位=(b+s+g+7)%10</p>
+  <p><strong>kill2公式：</strong>百位=(b-span+9)%10 · 十位=(s-mid+5)%10 · 个位=(g²+|b-g|)%10</p>
   <p><strong>重叠处理：</strong>kill2==kill1时自动+1偏移，保证2个杀码不重复</p>
 </div>
 <div class="info-card">
   <h3>📋 策略详情</h3>
-  <p><strong>百位 kill1：</strong>10条件决策树 — <strong>{stats['h']}%</strong> | kill2: (b²+s+g)%10 — <strong>{stats.get('h2', 'N/A')}%</strong></p>
-  <p><strong>十位 kill1：</strong>V8a增强公式 — <strong>{stats['t']}%</strong> | kill2: (b*s)%10 — <strong>{stats.get('t2', 'N/A')}%</strong></p>
-  <p><strong>个位 kill1：</strong>12条件决策树+自适应备份 — <strong>{stats['o']}%</strong> | kill2: (b+s+g+7)%10 — <strong>{stats.get('o2', 'N/A')}%</strong></p>
+  <p><strong>百位 kill1：</strong>10条件决策树 — <strong>{stats['h']}%</strong> | kill2: (b-span+9)%10 — <strong>{stats.get('h2', 'N/A')}%</strong></p>
+  <p><strong>十位 kill1：</strong>V8a增强公式 — <strong>{stats['t']}%</strong> | kill2: (s-mid+5)%10 — <strong>{stats.get('t2', 'N/A')}%</strong></p>
+  <p><strong>个位 kill1：</strong>12条件决策树+自适应备份 — <strong>{stats['o']}%</strong> | kill2: (g²+|b-g|)%10 — <strong>{stats.get('o2', 'N/A')}%</strong></p>
   <div class="warn">
     ⚠️ <strong>重要提示：</strong>彩票本质是随机游戏。本算法基于历史统计规律，当前100期3杀综合准确率<strong>{stats['overall']}%</strong>，6杀全中率<strong>{stats.get('all6Pct', 'N/A')}%</strong>。数学理论上杀一码极限≈90%，6杀全中理论上限≈66%。但无法保证未来准确率，请理性参考。
   </div>
